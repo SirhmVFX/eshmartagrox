@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { Minus, Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSiteContent } from "@/components/ContentProvider";
+import { useCart } from "@/lib/cart";
 import type { Product } from "@/lib/types";
 
 function FilterSection({
@@ -69,20 +70,33 @@ export default function Shop() {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedWeight, setSelectedWeight] = useState<string | null>(null);
   const [browseBy, setBrowseBy] = useState<string>("All Products");
+  const [query, setQuery] = useState("");
+  const cart = useCart();
 
-  const filteredProducts = allProducts.filter((product: Product) => {
-    if (selectedCategory && product.category !== selectedCategory) return false;
-    if (selectedPrice) {
-      const priceNum = parseInt(selectedPrice.replace("NGN ", ""));
-      if (product.price !== priceNum) return false;
-    }
-    if (selectedLength && product.length !== selectedLength) return false;
-    if (selectedQuantity && product.quantity !== selectedQuantity) return false;
-    if (selectedSize && product.size !== selectedSize) return false;
-    if (selectedWeight && product.weight !== selectedWeight) return false;
-    if (browseBy !== "All Products" && product.category !== browseBy) return false;
-    return true;
-  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    setQuery(params.get("q")?.trim() ?? "");
+  }, []);
+
+  const filteredProducts = useMemo(
+    () =>
+      allProducts.filter((product: Product) => {
+        if (query && !product.name.toLowerCase().includes(query.toLowerCase()) && !product.category.toLowerCase().includes(query.toLowerCase())) return false;
+        if (selectedCategory && product.category !== selectedCategory) return false;
+        if (selectedPrice) {
+          const priceNum = parseInt(selectedPrice.replace("NGN ", ""));
+          if (product.price !== priceNum) return false;
+        }
+        if (selectedLength && product.length !== selectedLength) return false;
+        if (selectedQuantity && product.quantity !== selectedQuantity) return false;
+        if (selectedSize && product.size !== selectedSize) return false;
+        if (selectedWeight && product.weight !== selectedWeight) return false;
+        if (browseBy !== "All Products" && product.category !== browseBy) return false;
+        return true;
+      }),
+    [allProducts, query, selectedCategory, selectedPrice, selectedLength, selectedQuantity, selectedSize, selectedWeight, browseBy]
+  );
 
   const clearAllFilters = () => {
     setSelectedCategory(null);
@@ -178,15 +192,23 @@ export default function Shop() {
         </div>
 
         <div className="flex-1">
-          <div className="mb-6 flex justify-between items-center">
-            <p className="text-gray-600">
-              Showing {filteredProducts.length} of {allProducts.length} products
-            </p>
-            <select className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-              {shop.sortOptions.map((opt) => (
-                <option key={opt}>{opt}</option>
-              ))}
-            </select>
+          <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-gray-600">Showing {filteredProducts.length} of {allProducts.length} products</p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search products or category"
+                className="w-full sm:w-[320px] border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <select className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                {shop.sortOptions.map((opt) => (
+                  <option key={opt}>{opt}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {filteredProducts.length === 0 ? (
@@ -237,7 +259,7 @@ export default function Shop() {
                         {settings.currencySymbol}
                         {product.price.toFixed(2)}
                       </span>
-                      <button className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
+                      <button onClick={() => cart.add({ id: product.id, name: product.name, price: product.price, quantity: 1 })} className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
                         Add to Cart
                       </button>
                     </div>

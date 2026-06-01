@@ -56,24 +56,24 @@ function Herosection() {
   const imgSrc = slide.image || FALLBACK_SLIDE.image;
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden min-h-[90vh]">
       {/* ── Original two-column layout ── */}
-      <div className="mx-auto flex justify-between items-center">
+      <div className="mx-auto flex justify-between items-center h-full">
         {/* Left — image */}
-        <div className="w-[60%] relative">
+        <div className="w-[60%] relative h-full">
           <Image
             key={imgSrc}
             src={imgSrc}
             alt={slide.headline}
             width={800}
             height={600}
-            className="w-full h-auto object-cover transition-opacity duration-700"
+            className="w-full h-full object-cover transition-opacity duration-700"
             priority
           />
         </div>
 
         {/* Right — text */}
-        <div className="w-[40%] p-24 space-y-6">
+        <div className="w-[40%] p-24 space-y-6 flex flex-col justify-center h-full">
           <h1
             key={`h-${current}`}
             className="text-6xl font-bold text-green-900 transition-all duration-500"
