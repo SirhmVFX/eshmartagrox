@@ -73,6 +73,136 @@ export default function Shop() {
   const [query, setQuery] = useState("");
   const cart = useCart();
 
+  const products = [
+    {
+      id: '1',
+      name: 'Okro',
+      price: 29.99,
+      image: '/assets/p1.jpg',
+      category: 'Vegetables',
+      quantity: '10 piece',
+      weight: '200g',
+      size: 'M',
+      isPublished: true
+    },
+    {
+      id: '2',
+      name: 'Cabbage',
+      price: 15.99,
+      image: '/assets/p2.jpg',
+      category: 'Vegetables',
+      quantity: '5 piece',
+      weight: '500g',
+      size: 'L',
+      isPublished: true
+    },
+    {
+      id: '3',
+      name: 'Carrot',
+      price: 12.99,
+      image: '/assets/p3.jpg',
+      category: 'Vegetables',
+      quantity: '20 piece',
+      weight: '300g',
+      size: 'S',
+      isPublished: true
+    },
+
+    {
+      id: '4',
+      name: 'Onions',
+      price: 18.99,
+      image: '/assets/p4.jpg',
+      category: 'Vegetables',
+      quantity: '15 piece',
+      weight: '400g',
+      size: 'M',
+      isPublished: true
+    },
+    {
+      id: '5',
+      name: 'Potatoes',
+      price: 25.99,
+      image: '/assets/p5.jpg',
+      category: 'Vegetables',
+      quantity: '8 piece',
+      weight: '600g',
+      size: 'L',
+      isPublished: true
+    },
+
+    {
+      id: '6',
+      name: 'Tomato',
+      price: 22.99,
+      image: '/assets/p6.jpg',
+      category: 'Vegetables',
+      quantity: '12 piece',
+      weight: '350g',
+      size: 'M',
+      isPublished: true
+    },
+
+    {
+      id: '7',
+      name: 'Spinach',
+      price: 14.99,
+      image: '/assets/p7.jpg',
+      category: 'Vegetables',
+      quantity: '10 piece',
+      weight: '250g',
+      size: 'M',
+      isPublished: true
+    },
+
+    {
+      id: '8',
+      name: 'Broccoli',
+      price: 20.99,
+      image: '/assets/p8.jpg',
+      category: 'Vegetables',
+      quantity: '6 piece',
+      weight: '450g',
+      size: 'L',
+      isPublished: true
+    },
+
+    {
+      id: '9',
+      name: 'Cucumber',
+      price: 16.99,
+      image: '/assets/p9.jpg',
+      category: 'Vegetables',
+      quantity: '10 piece',
+      weight: '300g',
+      size: 'M',
+      isPublished: true
+    },
+
+    {
+      id: '10',
+      name: 'Bell Pepper',
+      price: 19.99,
+      image: '/assets/p10.jpg',
+      category: 'Vegetables',
+      quantity: '8 piece',
+      weight: '300g',
+      size: 'M',
+      isPublished: true
+    },
+    {
+      id: '11',
+      name: 'Garlic',
+      price: 11.99,
+      image: '/assets/p11.jpg',
+      category: 'Vegetables',
+      quantity: '25 piece',
+      weight: '200g',
+      size: 'S',
+      isPublished: true
+    }
+  ]
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -81,14 +211,14 @@ export default function Shop() {
 
   const filteredProducts = useMemo(
     () =>
-      allProducts.filter((product: Product) => {
+      products.filter((product) => {
         if (query && !product.name.toLowerCase().includes(query.toLowerCase()) && !product.category.toLowerCase().includes(query.toLowerCase())) return false;
         if (selectedCategory && product.category !== selectedCategory) return false;
         if (selectedPrice) {
           const priceNum = parseInt(selectedPrice.replace("NGN ", ""));
           if (product.price !== priceNum) return false;
         }
-        if (selectedLength && product.length !== selectedLength) return false;
+        // if (selectedLength && product.length !== selectedLength) return false;
         if (selectedQuantity && product.quantity !== selectedQuantity) return false;
         if (selectedSize && product.size !== selectedSize) return false;
         if (selectedWeight && product.weight !== selectedWeight) return false;
@@ -109,11 +239,11 @@ export default function Shop() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen ">
       <div className="w-full h-[300px] relative overflow-hidden bg-gray-100">
         <div className="relative w-full h-full">
           <Image
-            src={shop.bannerImage || "https://images.unsplash.com/photo-1610832958506-aa563681aa1f?w=1600&q=80"}
+            src="/assets/1.jpg"
             alt="Shop Banner"
             fill
             className="object-cover"
@@ -125,7 +255,7 @@ export default function Shop() {
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row max-w-7xl mx-auto px-4 py-8 gap-8">
+      <div className="flex flex-col md:flex-row w-350 mx-auto px-4 py-8 gap-8">
         <div className="md:w-[280px] flex-shrink-0">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-800">Filters</h2>
@@ -212,7 +342,7 @@ export default function Shop() {
           </div>
 
           {filteredProducts.length === 0 ? (
-            <div className="text-center py-20 bg-gray-50 rounded-lg">
+            <div className="text-center py-20 ">
               <p className="text-gray-500 text-lg">No products found matching your filters.</p>
               <button
                 onClick={clearAllFilters}
@@ -226,7 +356,7 @@ export default function Shop() {
               {filteredProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100"
+                  className="group  overflow-hidden  transition-shadow duration-300 border border-gray-100"
                 >
                   <div className="relative w-full h-64 bg-gray-100">
                     <Image
@@ -240,10 +370,10 @@ export default function Shop() {
                     <div className="text-xs text-green-600 font-medium mb-1">
                       {product.category}
                     </div>
-                    <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2 min-h-[48px]">
+                    <p className="font-semibold text-gray-800 line-clamp-2 ">
                       {product.name}
-                    </h3>
-                    <div className="space-y-1 mb-3">
+                    </p>
+                    <div className="space-y-1 mb-3 flex gap-2">
                       {product.quantity && (
                         <p className="text-xs text-gray-500">{product.quantity}</p>
                       )}
@@ -259,9 +389,9 @@ export default function Shop() {
                         {settings.currencySymbol}
                         {product.price.toFixed(2)}
                       </span>
-                      <button onClick={() => cart.add({ id: product.id, name: product.name, price: product.price, quantity: 1 })} className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
+                      {/* <button onClick={() => cart.add({ id: product.id, name: product.name, price: product.price, quantity: 1 })} className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
                         Add to Cart
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>

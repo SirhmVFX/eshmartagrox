@@ -35,12 +35,12 @@ export default function TrackOrderPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Enter order number e.g. EA-2026-001"
-          className="flex-1"
+          className="flex-1 border border-black/30 p-4"
           required
         />
         <button
           type="submit"
-          className="bg-green-900 text-white px-6 py-2 rounded-lg hover:bg-green-800"
+          className="bg-green-900 text-white px-6 py-2  hover:bg-green-800"
         >
           Track
         </button>

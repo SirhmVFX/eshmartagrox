@@ -7,38 +7,48 @@ const FALLBACK_MAIN = "https://images.unsplash.com/photo-1500382017468-9049fed74
 const FALLBACK_SECONDARY = "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80";
 
 function Featuresection2() {
-  const { homeQuality } = useSiteContent();
 
-  const mainImg = homeQuality.mainImage || FALLBACK_MAIN;
-  const secondaryImg = homeQuality.secondaryImage || FALLBACK_SECONDARY;
+  const sectionBlocks = [
+    {
+      id: 1,
+      title: "Ethical Cultivation",
+      subtext: "Our okra and ugu cultivation begins with non-GMO seeds and organic soil enrichment. We employ advanced irrigation and pest-management systems that prioritize environmental health while maximizing nutrient density for the European market."
+    },
+    {
+      id: 2,
+      title: "Rigorous Export Audit",
+      subtext: "Each harvest undergoes a multi-stage audit: physical uniformity analysis, residue testing, and rapid cooling. Our quality compliance ensures every batch meets phytosanitary standards for international trade."
+    }
+  ]
+
 
   return (
-    <div className="bg-green-200 py-20">
-      <div className="w-[90%] mx-auto space-y-4">
-        <h1 className="text-5xl font-bold w-1/2">{homeQuality.sectionTitle}</h1>
+    <div className="bg-[#F4F7ED] py-20">
+      <div className="w-350 mx-auto space-y-4">
+        <h1 className="text-5xl font-bold w-1/2 text-green-900 mb-12">Meticulous Cultivation and Export Grade Quality Systems</h1>
         <div className="grid grid-cols-2 gap-8">
-          <div className="relative w-full h-[480px]">
+          <div className="relative w-full h-225">
             <Image
-              src={mainImg}
+              src="/assets/8.jpg"
               alt="Quality cultivation"
               fill
-              className="object-cover rounded-lg"
+              className="object-cover"
             />
           </div>
           <div className="space-y-10">
-            {homeQuality.blocks.map((block) => (
+            {sectionBlocks.map((block) => (
               <div key={block.id} className="space-y-4">
-                <h2 className="text-2xl font-bold">{block.title}</h2>
+                <h2 className="text-2xl font-bold  text-green-900">{block.title}</h2>
                 <div className="w-full bg-green-900 h-px" />
-                <p>{block.description}</p>
+                <p>{block.subtext}</p>
               </div>
             ))}
-            <div className="relative w-full h-56">
+            <div className="relative w-full h-125">
               <Image
-                src={secondaryImg}
+                src="/assets/9.jpg"
                 alt="Quality warehouse"
                 fill
-                className="object-cover rounded-lg"
+                className="object-cover "
               />
             </div>
           </div>
