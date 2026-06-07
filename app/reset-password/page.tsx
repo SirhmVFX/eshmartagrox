@@ -12,14 +12,14 @@ export default function ResetPasswordPage() {
   const handle = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus(null);
-+    setLoading(true);
+    +    setLoading(true);
     try {
       await resetPassword(email);
       setStatus("If an account exists, a reset email was sent.");
     } catch (err) {
       setStatus(err instanceof Error ? err.message : "Failed to send reset");
     } finally {
-+      setLoading(false);
+      +      setLoading(false);
     }
   };
 
@@ -30,9 +30,9 @@ export default function ResetPasswordPage() {
         {status && <p className="text-sm text-green-600">{status}</p>}
         <div>
           <label className="block text-sm">Email</label>
-          <input className="w-full" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input className="w-full p-4 border border-black/30" placeholder="Enter email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
-        <button className="bg-green-900 text-white px-4 py-2 rounded" type="submit" disabled={loading}>{loading ? "Sending..." : "Send reset email"}</button>
+        <button className="bg-green-900 text-white px-4 py-2 " type="submit" disabled={loading}>{loading ? "Sending..." : "Send reset email"}</button>
       </form>
     </div>
   );

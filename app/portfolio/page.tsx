@@ -3,38 +3,68 @@
 import Image from "next/image";
 import { useSiteContent } from "@/components/ContentProvider";
 
-const FALLBACKS = [
-  "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&q=80",
-  "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=600&q=80",
-  "https://images.unsplash.com/photo-1615485290382-441d4f1e1e8c?w=600&q=80",
-  "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=80",
-  "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80",
-  "https://images.unsplash.com/photo-1610832958506-aa563681aa1f?w=600&q=80",
-];
+
 
 function Portfolio() {
-  const { portfolio } = useSiteContent();
-  const items = portfolio.items.filter((i) => i.isPublished);
+
+  const portfolio = [
+    {
+      id: "01",
+      title: "Ugu - The Nigerian Superfood",
+      desc: "Featuring our high-quality Ugu leaves, carefully harvested and prepared for export. This project details our commitment to delivering nutritious and fresh Nigerian vegetables to consumers across Europe.",
+      image: "/assets/11.jpg"
+    },
+    {
+      id: "01",
+      title: "Buyer Inquiry Portal",
+      desc: "Facilitating seamless transactions with our international buyers. This project showcases the easy-to-use inquiry form designed for potential clients to request quotes and discuss their specific needs for Nigerian produce.",
+      image: "/assets/12.jpg"
+    },
+    {
+      id: "01",
+      title: "Cultivation Excellence",
+      desc: "An in-depth look at Eshmart Agrox's farming practices. This project emphasizes sustainable cultivation, advanced farming techniques, and the environment that nurtures our premium produce before export.",
+      image: "/assets/13.jpg"
+    },
+    {
+      id: "01",
+      title: "Rigorous Quality Assurance",
+      desc: "Detailing Eshmart's multi-stage quality control processes. From farm to export, this project demonstrates our dedication to meeting stringent international standards for freshness, safety, and quality of all produce.",
+      image: "/assets/14.jpg"
+    },
+    {
+      id: "01",
+      title: "Our Produce Range",
+      desc: "An overview of the various types of premium Nigerian produce Eshmart Agrox offers for export. This project provides a glimpse into the diversity and quality of our agricultural offerings tailored for European demand.",
+      image: "/assets/15.jpg"
+    },
+    {
+      id: "01",
+      title: "Premium Okra Export",
+      desc: "Showcasing Eshmart's top-grade Okra, ready for export to European markets. Highlights the meticulous cultivation process, stringent quality checks, and the exceptional freshness of our produce, ensuring buyers receive only the best.",
+      image: "/assets/10.jpg"
+    }
+  ]
 
   return (
     <div className="w-[90%] mx-auto py-20">
-      <h1 className="text-4xl font-bold text-green-900">{portfolio.pageTitle}</h1>
-      <p className="text-green-900 mt-2 mb-12">{portfolio.pageSubtitle}</p>
+      <h1 className="text-7xl font-bold text-green-900 mb-16">Portfolio</h1>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {items.map((item, i) => {
-          const imgSrc = item.image || FALLBACKS[i % FALLBACKS.length];
+        {portfolio.map((item, i) => {
+          const imgSrc = item.image;
           return (
             <div key={item.id} className="space-y-4">
-              <div className="relative h-64 w-full">
+              <div className="relative h-125 w-full">
                 <Image
                   src={imgSrc}
                   alt={item.title}
                   fill
-                  className="object-cover rounded-lg"
+                  className="object-cover"
                 />
               </div>
-              <h2 className="text-xl font-bold text-green-900">{item.title}</h2>
-              <p className="text-gray-600">{item.description}</p>
+              <h2 className="text-2xl font-bold text-green-900">{item.title}</h2>
+              <p className="text-gray-600">{item.desc}</p>
             </div>
           );
         })}
