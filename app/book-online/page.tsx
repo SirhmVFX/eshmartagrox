@@ -11,19 +11,52 @@ const SERVICE_FALLBACKS = [
 ];
 
 export default function BookOnline() {
-  const { services } = useSiteContent();
-  const list = services.services.filter((s) => s.isPublished);
+  const services = [
+    {
+      id: 1,
+      title: "Farm Tour",
+      duration: "60 minutes",
+      price: "$120",
+      description:
+        "a walk around farm",
+      bookHref: "/book",
+      bookLabel: "Book Now",
+      image: "/assets/1.jpg",
+    },
+    {
+      id: 2,
+      title: "Order Planning",
+      duration: "90 minutes",
+      price: "$150",
+      description:
+        "order planning",
+      bookHref: "/book",
+      bookLabel: "Book Now",
+      image: "/assets/2.jpg",
+    },
+
+    {
+      id: 3,
+      title: "produce consultation",
+      duration: "75 minutes",
+      price: "$140",
+      description:
+        "Warm stones are placed on key points of your body to promote relaxation.",
+      bookHref: "/book",
+      bookLabel: "Book Now",
+      image: "/assets/3.jpg",
+    },
+  ]
 
   return (
     <div className="w-[90%] mx-auto py-20">
-      <h1 className="text-4xl font-bold text-green-900">{services.pageTitle}</h1>
-      <p className="text-green-900 mt-2 mb-12">{services.pageSubtitle}</p>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {list.map((item, i) => {
+        {services.map((item, i) => {
           const imgSrc = item.image || SERVICE_FALLBACKS[i % SERVICE_FALLBACKS.length];
           return (
             <div key={item.id}>
-              <div className="relative h-48 w-full">
+              <div className="relative h-100 w-full">
                 <Image
                   src={imgSrc}
                   alt={item.title}

@@ -1,10 +1,46 @@
 "use client";
 
+import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import Link from "next/link";
 
 export default function CartPage() {
   const { items, remove, clear, total } = useCart();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleCheckout = async () => {
+    if (!email || items.length === 0) {
+      setError("Please provide a valid email before checking out.");
+      return;
+    }
+
+    setError(null);
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/paystack/initialize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          amount: Math.round(total * 100),
+          metadata: { items },
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        throw new Error(data.error || "Unable to start Paystack checkout.");
+      }
+
+      window.location.href = data.authorizationUrl;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to start payment.");
+      setLoading(false);
+    }
+  };
 
   if (items.length === 0)
     return (
@@ -32,11 +68,30 @@ export default function CartPage() {
           </li>
         ))}
       </ul>
-      <div className="mt-6 flex justify-between items-center">
-        <div className="font-bold">Total: ₦{total.toFixed(2)}</div>
-        <div className="flex gap-2">
-          <button className="px-4 py-2 bg-gray-100" onClick={() => clear()}>Clear</button>
-          <button className="px-4 py-2 bg-green-900 text-white">Checkout (demo)</button>
+      <div className="mt-6 space-y-4">
+        <div>
+          <label className="block text-sm font-semibold mb-2">Email for payment</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="customer@example.com"
+            className="w-full rounded-xl border border-gray-300 px-4 py-3"
+          />
+        </div>
+        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+        <div className="flex justify-between items-center">
+          <div className="font-bold">Total: ₦{total.toFixed(2)}</div>
+          <div className="flex gap-2">
+            <button className="px-4 py-2 bg-gray-100" onClick={() => clear()}>Clear</button>
+            <button
+              className="px-4 py-2 bg-green-900 text-white disabled:cursor-not-allowed disabled:bg-gray-300"
+              onClick={handleCheckout}
+              disabled={!email || loading}
+            >
+              {loading ? "Processing..." : "Pay with Paystack"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

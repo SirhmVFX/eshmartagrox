@@ -11,22 +11,62 @@ const BLOG_FALLBACKS = [
 ];
 
 export default function BlogPage() {
-  const { blog } = useSiteContent();
-  const posts = blog.posts.filter((p) => p.isPublished);
+  const blogs = [
+    {
+      id: 1,
+      title: "How crops are maintained",
+      excerpt:
+        "Managing crops can be a lot of work so you need to pay attention and focus using the right profucts to grow them and motitoring them continuosly ",
+      author: "Jane Smith",
+      publishedAt: "2023-05-15",
+      coverImage: "/assets/1.jpg",
+      slug: "/managingcrops"
+    },
+    {
+      id: 2,
+      title: "The future of farming",
+      excerpt:
+        "The future of farming is looking bright with new technologies and sustainable practices that are helping farmers produce more food while protecting the environment.",
+      author: "John Doe",
+      publishedAt: "2023-06-20",
+      coverImage: "/assets/2.jpg",
+      slug: "/futureoffarming"
+    },
+    {
+      id: 3,
+      title: "Sustainable agriculture practices",
+      excerpt:
+        "Learn about sustainable agriculture practices that help protect the environment while producing healthy food for our communities.",
+      author: "Emily Johnson",
+      publishedAt: "2023-07-10",
+      coverImage: "/assets/3.jpg",
+      slug: "/sustainableagriculture"
+    },
+    {
+      id: 4,
+      title: "The importance of soil health",
+      excerpt:
+        "Healthy soil is the foundation of successful farming. Discover why soil health matters and how to maintain it for better crop yields.",
+      author: "Michael Brown",
+      publishedAt: "2023-08-05",
+      coverImage: "/assets/4.jpg",
+      slug: "/importanceofsoil"
+    }
+  ]
 
   return (
     <div className="w-[90%] mx-auto py-20">
-      <h1 className="text-4xl font-bold text-green-900">{blog.pageTitle}</h1>
-      <p className="text-green-900 mt-2 mb-12">{blog.pageSubtitle}</p>
-      {posts.length === 0 ? (
+      <h1 className="text-7xl font-bold text-green-900 mb-20">Blogs</h1>
+
+      {blogs.length === 0 ? (
         <p className="text-gray-500">No blog posts yet. Check back soon.</p>
       ) : (
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post, i) => {
+          {blogs.map((post, i) => {
             const imgSrc = post.coverImage || BLOG_FALLBACKS[i % BLOG_FALLBACKS.length];
             return (
-              <article key={post.id} className="rounded-lg border border-green-100 overflow-hidden">
-                <div className="relative h-48 w-full">
+              <article key={post.id} className=" border border-green-100 overflow-hidden">
+                <div className="relative h-100 w-full">
                   <Image
                     src={imgSrc}
                     alt={post.title}
