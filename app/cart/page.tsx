@@ -44,26 +44,26 @@ export default function CartPage() {
 
   if (items.length === 0)
     return (
-      <div className="w-[90%] max-w-2xl mx-auto py-24">
-        <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
+      <div className="w-[90%] max-w-2xl mx-auto py-16 md:py-24">
+        <h1 className="text-xl md:text-2xl font-bold mb-4">Your Cart</h1>
         <p className="text-gray-600">Your cart is empty.</p>
         <Link href="/shop" className="text-green-700 mt-4 inline-block">Continue shopping</Link>
       </div>
     );
 
   return (
-    <div className="w-[90%] max-w-2xl mx-auto py-24">
-      <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
+    <div className="w-[90%] max-w-2xl mx-auto py-16 md:py-24">
+      <h1 className="text-xl md:text-2xl font-bold mb-4">Your Cart</h1>
       <ul className="space-y-4">
         {items.map((it) => (
-          <li key={it.id} className="flex justify-between items-center">
+          <li key={it.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 py-2 border-b border-gray-100">
             <div>
               <div className="font-medium">{it.name}</div>
               <div className="text-sm text-gray-500">Quantity: {it.quantity}</div>
             </div>
             <div className="flex items-center gap-4">
               <div className="font-medium">₦{(it.price * it.quantity).toFixed(2)}</div>
-              <button className="text-red-600" onClick={() => remove(it.id)}>Remove</button>
+              <button className="text-red-600 text-sm" onClick={() => remove(it.id)}>Remove</button>
             </div>
           </li>
         ))}
@@ -80,12 +80,12 @@ export default function CartPage() {
           />
         </div>
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div className="font-bold">Total: ₦{total.toFixed(2)}</div>
           <div className="flex gap-2">
-            <button className="px-4 py-2 bg-gray-100" onClick={() => clear()}>Clear</button>
+            <button className="px-4 py-2 bg-gray-100 text-sm md:text-base" onClick={() => clear()}>Clear</button>
             <button
-              className="px-4 py-2 bg-green-900 text-white disabled:cursor-not-allowed disabled:bg-gray-300"
+              className="px-4 py-2 bg-green-900 text-white disabled:cursor-not-allowed disabled:bg-gray-300 text-sm md:text-base"
               onClick={handleCheckout}
               disabled={!email || loading}
             >

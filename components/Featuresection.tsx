@@ -35,17 +35,17 @@ function Featuresection() {
   ]
 
   return (
-    <div className="py-20">
-      <div className="w-350 mx-auto">
-        <h1 className="text-4xl font-bold text-green-900">Our Produce</h1>
-        <p className="text-green-900">Premium Nigerian harvests meticulously selected for international prestige and exceptional freshness.</p>
-        <div className="mx-auto grid grid-cols-3 justify-between mt-8 gap-8">
+    <div className="py-12 md:py-20">
+      <div className="w-[90%] md:w-350 mx-auto">
+        <h1 className="text-3xl md:text-4xl font-bold text-green-900">Our Produce</h1>
+        <p className="text-green-900 mt-2">Premium Nigerian harvests meticulously selected for international prestige and exceptional freshness.</p>
+        <div className="mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 justify-between mt-8 gap-6 md:gap-8">
           {produce.map((card, i) => {
             const imgSrc = card.image || CARD_FALLBACKS[i % CARD_FALLBACKS.length];
             return (
               <div key={card.id} className="space-y-4">
                 {card.image ?
-                  <div className="relative w-full h-150 overflow-hidden ">
+                  <div className="relative w-full h-72 sm:h-100 md:h-150 overflow-hidden ">
                     <Image
                       src={card.image}
                       alt={card.title}
@@ -55,8 +55,8 @@ function Featuresection() {
                   </div>
                   : ""}
                 <p className="text-green-900 font-mono text-sm">{card.id}</p>
-                <h2 className="text-2xl font-bold text-green-900">{card.title}</h2>
-                <p className="text-green-900">{card.subtext}</p>
+                <h2 className="text-xl md:text-2xl font-bold text-green-900">{card.title}</h2>
+                <p className="text-green-900 text-sm md:text-base">{card.subtext}</p>
                 <Link
                   href="/contact"
                   className="inline-block border border-green-900 py-2 px-4 text-green-900 hover:bg-green-900 hover:text-white transition-colors"

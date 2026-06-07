@@ -22,16 +22,16 @@ export default function BlogPostPage() {
   }
 
   return (
-    <article className="w-[90%] max-w-3xl mx-auto py-20">
+    <article className="w-[90%] max-w-3xl mx-auto py-12 md:py-20">
       <Link href="/blog" className="text-green-900 hover:underline text-sm">
         ← Back to blog
       </Link>
-      <h1 className="text-4xl font-bold text-green-900 mt-6">{post.title}</h1>
-      <p className="text-gray-500 mt-2">
+      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-green-900 mt-6 mb-4">{post.title}</h1>
+      <p className="text-gray-500 text-sm md:text-base mt-2 mb-6">
         {post.author}
         {post.publishedAt && ` · ${new Date(post.publishedAt).toLocaleDateString()}`}
       </p>
-      <div className="relative h-64 w-full mt-8 rounded-lg overflow-hidden">
+      <div className="relative h-64 md:h-80 w-full rounded-lg overflow-hidden mb-8">
         <Image
           src={post.coverImage || "https://images.unsplash.com/photo-1598170845058-32b9d6a36963?w=800&q=80"}
           alt={post.title}
@@ -39,7 +39,7 @@ export default function BlogPostPage() {
           className="object-cover"
         />
       </div>
-      <div className="prose mt-8 whitespace-pre-wrap text-gray-700">{post.content}</div>
+      <div className="prose prose-sm md:prose-lg mt-8 whitespace-pre-wrap text-gray-700">{post.content}</div>
     </article>
   );
 }

@@ -55,18 +55,18 @@ export default function BlogPage() {
   ]
 
   return (
-    <div className="w-[90%] mx-auto py-20">
-      <h1 className="text-7xl font-bold text-green-900 mb-20">Blogs</h1>
+    <div className="w-[90%] mx-auto py-12 md:py-20">
+      <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold text-green-900 mb-8 md:mb-12 lg:mb-20 text-center md:text-left">Blogs</h1>
 
       {blogs.length === 0 ? (
-        <p className="text-gray-500">No blog posts yet. Check back soon.</p>
+        <p className="text-gray-500 text-center">No blog posts yet. Check back soon.</p>
       ) : (
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {blogs.map((post, i) => {
             const imgSrc = post.coverImage || BLOG_FALLBACKS[i % BLOG_FALLBACKS.length];
             return (
-              <article key={post.id} className=" border border-green-100 overflow-hidden">
-                <div className="relative h-100 w-full">
+              <article key={post.id} className="border border-green-100 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div className="relative h-48 sm:h-64 w-full">
                   <Image
                     src={imgSrc}
                     alt={post.title}
@@ -74,17 +74,17 @@ export default function BlogPage() {
                     className="object-cover"
                   />
                 </div>
-                <div className="p-6 space-y-3">
-                  <h2 className="text-xl font-bold text-green-900">{post.title}</h2>
-                  <p className="text-sm text-gray-500">
+                <div className="p-4 sm:p-6 space-y-3">
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-green-900 line-clamp-2">{post.title}</h2>
+                  <p className="text-xs sm:text-sm text-gray-500">
                     {post.author}
                     {post.publishedAt &&
                       ` · ${new Date(post.publishedAt).toLocaleDateString()}`}
                   </p>
-                  <p className="text-gray-600">{post.excerpt}</p>
+                  <p className="text-sm sm:text-base text-gray-600 line-clamp-3">{post.excerpt}</p>
                   <Link
                     href={`/blog/${post.slug}`}
-                    className="text-green-900 font-medium hover:underline"
+                    className="text-green-900 font-medium hover:underline text-sm sm:text-base"
                   >
                     Read more →
                   </Link>

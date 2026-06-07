@@ -239,7 +239,7 @@ export default function Shop() {
   };
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen w-full">
       <div className="w-full h-[300px] relative overflow-hidden bg-gray-100">
         <div className="relative w-full h-full">
           <Image
@@ -250,13 +250,13 @@ export default function Shop() {
             priority
           />
           <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white">{shop.bannerTitle}</h1>
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white px-4 text-center">{shop.bannerTitle}</h1>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row w-350 mx-auto px-4 py-8 gap-8">
-        <div className="md:w-[280px] flex-shrink-0">
+      <div className="flex flex-col md:flex-row w-[90%] mx-auto px-4 py-8 gap-6 md:gap-8">
+        <div className="md:w-[280px] flex-shrink-0 w-full">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-800">Filters</h2>
             <button
@@ -342,7 +342,7 @@ export default function Shop() {
           </div>
 
           {filteredProducts.length === 0 ? (
-            <div className="text-center py-20 ">
+            <div className="text-center py-12 md:py-20">
               <p className="text-gray-500 text-lg">No products found matching your filters.</p>
               <button
                 onClick={clearAllFilters}
@@ -352,13 +352,13 @@ export default function Shop() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {filteredProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="group  overflow-hidden  transition-shadow duration-300 border border-gray-100"
+                  className="group overflow-hidden transition-shadow duration-300 border border-gray-100"
                 >
-                  <div className="relative w-full h-64 bg-gray-100">
+                  <div className="relative w-full h-64 md:h-48 lg:h-64 bg-gray-100">
                     <Image
                       src={product.image || "https://images.unsplash.com/photo-1603048297172-c92544798d5a?w=600&q=80"}
                       alt={product.name}
@@ -366,14 +366,14 @@ export default function Shop() {
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  <div className="p-4">
+                  <div className="p-3 md:p-4">
                     <div className="text-xs text-green-600 font-medium mb-1">
                       {product.category}
                     </div>
-                    <p className="font-semibold text-gray-800 line-clamp-2 ">
+                    <p className="font-semibold text-gray-800 line-clamp-2 text-sm md:text-base">
                       {product.name}
                     </p>
-                    <div className="space-y-1 mb-3 flex gap-2">
+                    <div className="space-y-1 mb-3 flex flex-wrap gap-2">
                       {product.quantity && (
                         <p className="text-xs text-gray-500">{product.quantity}</p>
                       )}
@@ -389,9 +389,6 @@ export default function Shop() {
                         {settings.currencySymbol}
                         {product.price.toFixed(2)}
                       </span>
-                      {/* <button onClick={() => cart.add({ id: product.id, name: product.name, price: product.price, quantity: 1 })} className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
-                        Add to Cart
-                      </button> */}
                     </div>
                   </div>
                 </div>

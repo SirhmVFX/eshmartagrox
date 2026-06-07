@@ -47,15 +47,15 @@ function Portfolio() {
   ]
 
   return (
-    <div className="w-[90%] mx-auto py-20">
-      <h1 className="text-7xl font-bold text-green-900 mb-16">Portfolio</h1>
+    <div className="w-[90%] mx-auto py-12 md:py-20">
+      <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold text-green-900 mb-8 md:mb-16">Portfolio</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
         {portfolio.map((item, i) => {
           const imgSrc = item.image;
           return (
-            <div key={item.id} className="space-y-4">
-              <div className="relative h-125 w-full">
+            <div key={`${item.id}-${i}`} className="space-y-4">
+              <div className="relative h-72 sm:h-100 md:h-125 w-full">
                 <Image
                   src={imgSrc}
                   alt={item.title}
@@ -63,8 +63,8 @@ function Portfolio() {
                   className="object-cover"
                 />
               </div>
-              <h2 className="text-2xl font-bold text-green-900">{item.title}</h2>
-              <p className="text-gray-600">{item.desc}</p>
+              <h2 className="text-xl md:text-2xl font-bold text-green-900">{item.title}</h2>
+              <p className="text-sm md:text-base text-gray-600">{item.desc}</p>
             </div>
           );
         })}

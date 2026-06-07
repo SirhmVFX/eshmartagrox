@@ -38,7 +38,7 @@ function Herosection() {
       url: "/products"
     },
     {
-      id: 3,
+      id: 4,
       image: "/assets/4.jpg",
       headline: "Ethical Cultivation. Transparent Supply Chains.",
       subtext: "From non-GMO seeds to certified packhouses — every step of our supply chain is documented, audited, and traceable for our European partners.",
@@ -78,37 +78,37 @@ function Herosection() {
 
 
   return (
-    <div className="relative overflow-hidden h-[80vh] w-[1400] mx-auto">
+    <div className="relative overflow-hidden h-[60vh] md:h-[80vh] w-full md:w-[1400] mx-auto">
       {/* ── Original two-column layout ── */}
       {heroSlidee && heroSlidee.length > 0 ? heroSlidee.map((hero) => (
-        <div className="mx-auto flex justify-between items-stretch h-full">
+        <div key={hero.id} className="mx-auto flex flex-col md:flex-row justify-between items-stretch h-full">
           {/* Left — image */}
-          <div className="w-[60%] relative h-full overflow-hidden">
+          <div className="w-full md:w-[60%] relative h-[40vh] md:h-full overflow-hidden">
             <Image
               key={hero.id}
               src={hero.image}
               alt={hero.headline}
               fill
-              sizes="60vw"
+              sizes="(max-width: 768px) 100vw, 60vw"
               className="w-full h-full object-cover transition-opacity duration-700"
               priority
             />
           </div>
 
           {/* Right — text */}
-          <div className="w-[40%] p-24 space-y-6 flex flex-col justify-center h-full bg-white">
+          <div className="w-full md:w-[40%] p-6 sm:p-10 md:p-24 space-y-4 md:space-y-6 flex flex-col justify-center h-full bg-white">
             <h1
               key={`h-${hero.id}`}
-              className="text-6xl font-bold text-green-900 transition-all duration-500"
+              className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-green-900 transition-all duration-500"
             >
               {hero.headline}
             </h1>
-            <p key={`p-${hero.id}`} className="transition-all duration-500">
+            <p key={`p-${hero.id}`} className="text-sm sm:text-base transition-all duration-500">
               {hero.subtext}
             </p>
             <Link
               href={hero.url}
-              className="inline-block bg-green-900 text-white px-4 py-2 w-fit"
+              className="inline-block bg-green-900 text-white px-4 py-2 w-fit text-sm sm:text-base"
             >
               {hero.buttonText}
             </Link>

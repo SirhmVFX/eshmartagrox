@@ -49,14 +49,13 @@ export default function BookOnline() {
   ]
 
   return (
-    <div className="w-[90%] mx-auto py-20">
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="w-[90%] mx-auto py-12 md:py-20">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
         {services.map((item, i) => {
           const imgSrc = item.image || SERVICE_FALLBACKS[i % SERVICE_FALLBACKS.length];
           return (
             <div key={item.id}>
-              <div className="relative h-100 w-full">
+              <div className="relative h-64 sm:h-80 md:h-100 w-full">
                 <Image
                   src={imgSrc}
                   alt={item.title}
@@ -64,15 +63,15 @@ export default function BookOnline() {
                   className="object-cover"
                 />
               </div>
-              <div className="p-8 border border-green-900/10 space-y-4">
-                <h2 className="text-3xl font-bold">{item.title}</h2>
+              <div className="p-4 sm:p-6 md:p-8 border border-green-900/10 space-y-4">
+                <h2 className="text-2xl md:text-3xl font-bold">{item.title}</h2>
                 <div className="w-full h-px bg-green-900/10" />
                 <p>{item.duration}</p>
                 <p className="font-semibold text-green-900">{item.price}</p>
                 <p className="text-sm text-gray-600">{item.description}</p>
                 <Link
                   href={item.bookHref}
-                  className="inline-block bg-green-900 text-white px-4 py-2"
+                  className="inline-block bg-green-900 text-white px-4 py-2 text-sm md:text-base"
                 >
                   {item.bookLabel}
                 </Link>

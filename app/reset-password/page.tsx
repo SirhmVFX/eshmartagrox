@@ -24,15 +24,15 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="w-[90%] max-w-md mx-auto py-24">
-      <h1 className="text-2xl font-bold mb-4">Reset password</h1>
+    <div className="w-[90%] max-w-md mx-auto py-16 md:py-24">
+      <h1 className="text-xl md:text-2xl font-bold mb-4">Reset password</h1>
       <form onSubmit={handle} className="space-y-4">
         {status && <p className="text-sm text-green-600">{status}</p>}
         <div>
           <label className="block text-sm">Email</label>
-          <input className="w-full p-4 border border-black/30" placeholder="Enter email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input className="w-full p-3 md:p-4 border border-black/30" placeholder="Enter email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
-        <button className="bg-green-900 text-white px-4 py-2 " type="submit" disabled={loading}>{loading ? "Sending..." : "Send reset email"}</button>
+        <button className="bg-green-900 text-white px-4 py-2 text-sm md:text-base w-full sm:w-auto" type="submit" disabled={loading}>{loading ? "Sending..." : "Send reset email"}</button>
       </form>
     </div>
   );

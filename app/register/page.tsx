@@ -31,11 +31,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center py-20">
-      <div className="w-350 max-w-md mx-auto border border-black/10 p-8">
+    <div className="min-h-[70vh] flex items-center justify-center py-12 md:py-20 px-4">
+      <div className="w-full max-w-md mx-auto border border-black/10 p-6 sm:p-8">
         <div className="mb-6 border-b border-gray-200 pb-4">
           <p className="text-sm uppercase tracking-[0.3em] text-green-700">New account</p>
-          <h1 className="text-3xl font-bold mt-2 text-gray-900">Create your account</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mt-2 text-gray-900">Create your account</h1>
           <p className="text-sm text-gray-500 mt-2">Register once to save your cart, track orders and manage profile details.</p>
         </div>
         <form onSubmit={handle} className="space-y-5">
