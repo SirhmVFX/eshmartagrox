@@ -10,6 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-dm-serif-text);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,14 +20,24 @@
   }
 }
 
+@font-face {
+  font-family: 'MyCustomFont';
+  src: url('/public/fonts/Plantin\ BQ\ Regular.otf') format('otf'),
+    url('/public/fonts/Plantin\ BQ\ Regular.otf') format('otf');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
   background: var(--background);
-  /* color: ;
-  font-family: ; */
 }
 
-h1 {
- font-family: 'Plantin MT Std', sans-serif;
-  font-weight: bold;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
 }
-
