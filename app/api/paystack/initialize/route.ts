@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
-if (!PAYSTACK_SECRET_KEY) {
-  throw new Error("PAYSTACK_SECRET_KEY must be set in environment variables.");
-}
-
 function getCallbackUrl(request: Request) {
   const url = new URL(request.url);
   return `${url.origin}/cart/payment-success`;
 }
 
 export async function POST(request: Request) {
+  const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+  if (!PAYSTACK_SECRET_KEY) {
+    return NextResponse.json({ error: "Payment is not configured." }, { status: 500 });
+  }
+
   const payload = await request.json().catch(() => null);
   const email = typeof payload?.email === "string" ? payload.email.trim() : "";
   const amount = Number(payload?.amount);
