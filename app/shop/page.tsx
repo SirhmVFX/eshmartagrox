@@ -81,6 +81,7 @@ export default function Shop() {
       image: '/assets/p1.jpg',
       category: 'Vegetables',
       quantity: '10 piece',
+      description: "Lorem",
       weight: '200g',
       size: 'M',
       isPublished: true
@@ -92,6 +93,7 @@ export default function Shop() {
       image: '/assets/p2.jpg',
       category: 'Vegetables',
       quantity: '5 piece',
+      description: "Lorem",
       weight: '500g',
       size: 'L',
       isPublished: true
@@ -103,6 +105,7 @@ export default function Shop() {
       image: '/assets/p3.jpg',
       category: 'Vegetables',
       quantity: '20 piece',
+      description: "Lorem",
       weight: '300g',
       size: 'S',
       isPublished: true
@@ -115,6 +118,7 @@ export default function Shop() {
       image: '/assets/p4.jpg',
       category: 'Vegetables',
       quantity: '15 piece',
+      description: "Lorem",
       weight: '400g',
       size: 'M',
       isPublished: true
@@ -126,6 +130,7 @@ export default function Shop() {
       image: '/assets/p5.jpg',
       category: 'Vegetables',
       quantity: '8 piece',
+      description: "Lorem",
       weight: '600g',
       size: 'L',
       isPublished: true
@@ -138,6 +143,7 @@ export default function Shop() {
       image: '/assets/p6.jpg',
       category: 'Vegetables',
       quantity: '12 piece',
+      description: "Lorem",
       weight: '350g',
       size: 'M',
       isPublished: true
@@ -150,6 +156,7 @@ export default function Shop() {
       image: '/assets/p7.jpg',
       category: 'Vegetables',
       quantity: '10 piece',
+      description: "Lorem",
       weight: '250g',
       size: 'M',
       isPublished: true
@@ -162,6 +169,7 @@ export default function Shop() {
       image: '/assets/p8.jpg',
       category: 'Vegetables',
       quantity: '6 piece',
+      description: "Lorem",
       weight: '450g',
       size: 'L',
       isPublished: true
@@ -174,6 +182,7 @@ export default function Shop() {
       image: '/assets/p9.jpg',
       category: 'Vegetables',
       quantity: '10 piece',
+      description: "Lorem",
       weight: '300g',
       size: 'M',
       isPublished: true
@@ -186,6 +195,7 @@ export default function Shop() {
       image: '/assets/p10.jpg',
       category: 'Vegetables',
       quantity: '8 piece',
+      description: "Lorem",
       weight: '300g',
       size: 'M',
       isPublished: true
@@ -197,6 +207,7 @@ export default function Shop() {
       image: '/assets/p11.jpg',
       category: 'Vegetables',
       quantity: '25 piece',
+      description: "Lorem",
       weight: '200g',
       size: 'S',
       isPublished: true
