@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server";
-
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
-if (!PAYSTACK_SECRET_KEY) {
-  throw new Error("PAYSTACK_SECRET_KEY must be set in environment variables.");
-}
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { reference: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ reference: string }> }
 ) {
-  const reference = params.reference;
+  const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+  if (!PAYSTACK_SECRET_KEY) {
+    return NextResponse.json({ error: "Payment is not configured." }, { status: 500 });
+  }
+
+  const { reference } = await params;
   if (!reference) {
     return NextResponse.json({ error: "Missing reference." }, { status: 400 });
   }
