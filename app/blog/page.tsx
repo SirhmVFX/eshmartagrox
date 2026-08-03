@@ -36,7 +36,7 @@ function BlogCard({ post }: { post: BlogPost }) {
   return (
     <article className="flex flex-col gap-3">
       {/* Cover image */}
-      <Link href={href} className="block overflow-hidden aspect-[4/3] bg-gray-100 relative">
+      <Link href={href} className="block overflow-hidden aspect-4/3 bg-gray-100 relative">
         <Image
           src={post.coverImage || "/assets/1.jpg"}
           alt={post.title}
@@ -112,7 +112,7 @@ export default function BlogPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="space-y-3 animate-pulse">
-              <div className="aspect-[4/3] bg-gray-200" />
+              <div className="aspect-4/3 bg-gray-200" />
               <div className="h-3 bg-gray-200 w-2/3" />
               <div className="h-4 bg-gray-200 w-full" />
               <div className="h-3 bg-gray-200 w-full" />

@@ -74,7 +74,7 @@ function OrderTimeline({ status }: { status: string }) {
               <div className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-colors ${active ? "border-green-700 bg-green-700 text-white" : done ? "border-green-500 bg-green-50 text-green-600" : "border-gray-200 bg-white text-gray-400"}`}>
                 <Icon size={13} />
               </div>
-              <span className={`text-[9px] font-medium text-center leading-tight max-w-[52px] ${active ? "text-green-700" : done ? "text-gray-600" : "text-gray-400"}`}>
+              <span className={`text-[9px] font-medium text-center leading-tight max-w-13 ${active ? "text-green-700" : done ? "text-gray-600" : "text-gray-400"}`}>
                 {meta.label}
               </span>
             </div>
@@ -248,24 +248,27 @@ export default function ProfilePage() {
         )}
 
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Sidebar nav */}
+          {/* Sidebar nav — horizontal scrolling on mobile, vertical on desktop */}
           <aside className="md:w-52 shrink-0">
-            <nav className="bg-white border border-gray-200 overflow-hidden">
+            <nav className="flex md:flex-col overflow-x-auto md:overflow-visible bg-white border border-gray-200">
               {TABS.map(t => (
                 <button
                   key={t.id}
                   onClick={() => setTab(t.id)}
-                  className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 text-sm font-medium transition-colors border-b border-gray-100 last:border-0 ${tab === t.id ? "bg-green-900 text-white" : "text-gray-700 hover:bg-gray-50"}`}
+                  className={`flex items-center gap-2.5 px-4 py-3.5 text-sm font-medium transition-colors shrink-0 md:shrink md:w-full md:justify-between whitespace-nowrap border-b-2 md:border-b border-b-transparent md:border-gray-100 md:last:border-0 ${tab === t.id
+                      ? "border-b-green-900 md:border-b-gray-100 md:bg-green-900 md:text-white text-green-900"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <t.icon size={15} />
                     {t.label}
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 ml-auto md:ml-0">
                     {t.badge && t.badge > 0 ? (
                       <span className="bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">{t.badge}</span>
                     ) : (
-                      <ChevronRight size={14} className="opacity-40" />
+                      <ChevronRight size={14} className="opacity-40 hidden md:block" />
                     )}
                   </div>
                 </button>

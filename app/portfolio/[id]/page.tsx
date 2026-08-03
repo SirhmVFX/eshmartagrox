@@ -45,7 +45,7 @@ export default function PortfolioDetailPage() {
         <>
             {/* ── Hero cover image ── */}
             {item.image && (
-                <div className="w-full h-64 sm:h-96 md:h-[520px] mt-16 md:mt-20 relative overflow-hidden">
+                <div className="w-full h-64 sm:h-96 md:h-130 mt-16 md:mt-20 relative overflow-hidden">
                     <Image
                         src={item.image}
                         alt={item.title}

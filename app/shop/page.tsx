@@ -87,7 +87,7 @@ export default function Shop() {
   return (
     <div className="min-h-screen w-full">
       {/* Banner */}
-      <div className="w-full h-[300px] relative overflow-hidden bg-gray-100">
+      <div className="w-full h-75 relative overflow-hidden bg-gray-100">
         <Image src={bannerImage} alt="Shop Banner" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white px-4 text-center">
@@ -98,7 +98,7 @@ export default function Shop() {
 
       <div className="flex flex-col md:flex-row w-[90%] mx-auto px-4 py-8 gap-6 md:gap-8">
         {/* Sidebar filters */}
-        <div className="md:w-[280px] shrink-0 w-full">
+        <div className="md:w-70 shrink-0 w-full">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-800">Filters</h2>
             <button
