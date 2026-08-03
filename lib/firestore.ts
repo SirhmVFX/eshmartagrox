@@ -502,8 +502,12 @@ export async function getOrdersByEmail(email: string): Promise<ClientOrder[]> {
     return snap.docs
         .map(d => ({ id: d.id, ...d.data() } as ClientOrder))
         .sort((a, b) => {
-            const ta = a.createdAt?.toMillis?.() ?? new Date(a.createdAt ?? 0).getTime();
-            const tb = b.createdAt?.toMillis?.() ?? new Date(b.createdAt ?? 0).getTime();
+            const ta = typeof a.createdAt === "string"
+                ? new Date(a.createdAt).getTime()
+                : a.createdAt?.toMillis?.() ?? 0;
+            const tb = typeof b.createdAt === "string"
+                ? new Date(b.createdAt).getTime()
+                : b.createdAt?.toMillis?.() ?? 0;
             return tb - ta;
         });
 }

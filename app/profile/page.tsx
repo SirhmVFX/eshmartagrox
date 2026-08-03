@@ -11,7 +11,7 @@ import {
   markNotificationRead, markAllNotificationsRead,
   ClientOrder, OrderNotification,
 } from "@/lib/firestore";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Package, Bell, User, Shield, ChevronRight, CheckCircle, Circle, Clock, Truck, Home, XCircle, AlertCircle } from "lucide-react";
 
@@ -142,10 +142,28 @@ export default function ProfilePage() {
 
   // Load orders when tab switches
   useEffect(() => {
-    if (tab === "orders" && user?.email && orders.length === 0) {
+    if (tab === "orders" && user && orders.length === 0) {
       setOrdersLoading(true);
-      getOrdersByEmail(user.email)
-        .then(setOrders)
+      // Query by both email AND userId so guest orders and logged-in orders both show
+      Promise.all([
+        user.email ? getOrdersByEmail(user.email) : Promise.resolve([] as ClientOrder[]),
+        getDocs(query(collection(db, "orders"), where("userId", "==", user.uid)))
+          .then(snap => snap.docs.map(d => ({ id: d.id, ...d.data() } as ClientOrder)))
+          .catch(() => [] as ClientOrder[]),
+      ])
+        .then(([byEmail, byUid]) => {
+          const seen = new Set<string>();
+          const merged: ClientOrder[] = [];
+          [...byEmail, ...byUid].forEach(o => {
+            if (!seen.has(o.id)) { seen.add(o.id); merged.push(o); }
+          });
+          merged.sort((a, b) => {
+            const ta = typeof a.createdAt === "string" ? new Date(a.createdAt).getTime() : a.createdAt?.toMillis?.() ?? 0;
+            const tb = typeof b.createdAt === "string" ? new Date(b.createdAt).getTime() : b.createdAt?.toMillis?.() ?? 0;
+            return tb - ta;
+          });
+          setOrders(merged);
+        })
         .catch(() => { })
         .finally(() => setOrdersLoading(false));
     }
@@ -256,8 +274,8 @@ export default function ProfilePage() {
                   key={t.id}
                   onClick={() => setTab(t.id)}
                   className={`flex items-center gap-2.5 px-4 py-3.5 text-sm font-medium transition-colors shrink-0 md:shrink md:w-full md:justify-between whitespace-nowrap border-b-2 md:border-b border-b-transparent md:border-gray-100 md:last:border-0 ${tab === t.id
-                      ? "border-b-green-900 md:border-b-gray-100 md:bg-green-900 md:text-white text-green-900"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "border-b-green-900 md:border-b-gray-100 md:bg-green-900 md:text-white text-green-900"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                     }`}
                 >
                   <div className="flex items-center gap-2.5">
