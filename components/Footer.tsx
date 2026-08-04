@@ -5,96 +5,118 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getSiteSettings, SiteSettings } from "@/lib/firestore";
 
-function Footer() {
+const SOCIAL = ["Threads", "TikTok", "Instagram", "Facebook", "LinkedIn", "Pinterest", "YouTube"];
+
+const COLS = [
+  {
+    heading: "Shop",
+    links: [
+      { label: "Senior Wellness", href: "/shop" },
+      { label: "Family Package", href: "/shop" },
+      { label: "Student Smart Pack", href: "/shop" },
+      { label: "Working Professional", href: "/shop" },
+      { label: "Subscriptions", href: "/shop" },
+    ],
+  },
+  {
+    heading: "Health",
+    links: [
+      { label: "Diabetes", href: "/calculator" },
+      { label: "Blood Pressure", href: "/calculator" },
+      { label: "Cholesterol", href: "/calculator" },
+      { label: "Healthy Aging", href: "/calculator" },
+      { label: "BMI Calculator", href: "/calculator" },
+    ],
+  },
+  {
+    heading: "Company",
+    links: [
+      { label: "About us", href: "/about" },
+      { label: "Blog", href: "/blog" },
+      { label: "Community", href: "/#community" },
+      { label: "Loyalty Club", href: "/profile" },
+      { label: "Careers", href: "/contact" },
+    ],
+  },
+  {
+    heading: "Support",
+    links: [
+      { label: "WhatsApp support", href: "https://wa.me/2347047296000" },
+      { label: "Delivery zones", href: "/contact" },
+      { label: "Returns", href: "/contact" },
+      { label: "+234 704 729 6000", href: "tel:+2347047296000" },
+      { label: "FAQ", href: "/#faq" },
+    ],
+  },
+];
+
+export default function Footer() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
     getSiteSettings().then(setSettings).catch(() => { });
   }, []);
 
-  const phone = settings?.contactPhone ?? "+234 800 ESHMART";
-  const email = settings?.contactEmail ?? "export@eshmartagrox.com";
-  const address = settings?.address ?? "20b Kingsley Emu Street, Lekki Phase 1 Lagos";
-  const siteName = settings?.siteName ?? "Eshmart Agrox";
-  const tagline = settings?.tagline ?? "Premium Nigerian produce for international markets.";
-  const copyright = `© ${new Date().getFullYear()} ${siteName}. All Rights Reserved.`;
+  const siteName = settings?.siteName ?? "ESHMARTAGROX";
+  const tagline = settings?.tagline ?? "Nigeria's home for healthy eating, senior wellness, smart grocery delivery and organic commodity exports to Europe, USA & Asia.";
+  const year = new Date().getFullYear();
 
   return (
-    <footer className="py-10 md:py-16 mt-auto border-t border-gray-100">
-      <div className="w-[90%] mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
-          {/* Brand */}
-          <div className="sm:col-span-2 lg:col-span-1">
-            <div className="mb-3 w-24 h-24 relative shrink-0">
-              {settings?.logoUrl ? (
-                <Image src={settings.logoUrl} alt={siteName} fill className="object-contain" />
-              ) : (
-                <Image src="/assets/eshmartlogo.png" alt="Eshmart Agrox Logo" fill className="object-contain" />
-              )}
+    <footer className="bg-[#FFFDF7] border-t border-gray-200 pt-14 pb-8">
+      <div className="container-max">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
+
+          {/* Brand column */}
+          <div className="lg:col-span-1 space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="relative w-8 h-8 shrink-0">
+                {settings?.logoUrl
+                  ? <Image src={settings.logoUrl} alt={siteName} fill className="object-contain" />
+                  : <Image src="/assets/eshmartlogo.png" alt={siteName} width={32} height={32} className="object-contain" />}
+              </div>
+              <span className="font-bold text-sm tracking-widest text-gray-900 uppercase">{siteName}</span>
             </div>
-            <p className="text-sm text-gray-600 leading-relaxed max-w-[240px]">{tagline}</p>
-          </div>
 
-          {/* Navigation links */}
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              {[
-                { label: "Home", href: "/" },
-                { label: "Shop", href: "/shop" },
-                { label: "Portfolio", href: "/portfolio" },
-                { label: "Blog", href: "/blog" },
-                { label: "Book Online", href: "/book-online" },
-                { label: "Contact", href: "/contact" },
-              ].map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="text-sm text-gray-600 hover:text-green-900 transition-colors">
-                    {l.label}
-                  </Link>
-                </li>
+            <p className="text-xs text-gray-500 leading-relaxed max-w-[220px]">{tagline}</p>
+
+            {/* Social pills */}
+            <div className="flex flex-wrap gap-1.5">
+              {SOCIAL.map(s => (
+                <span key={s} className="border border-gray-200 rounded-full px-3 py-1 text-xs text-gray-600 hover:border-gray-400 cursor-pointer transition-colors">
+                  {s}
+                </span>
               ))}
-            </ul>
+            </div>
+
+            {/* Payment methods */}
+            <p className="text-xs text-gray-400">Paystack · Flutterwave · Bank transfer · USSD</p>
           </div>
 
-          {/* Office */}
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Lagos Office</h3>
-            <p className="text-sm text-gray-600 leading-relaxed mb-4">{address}</p>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-3">Inquiries</h3>
-            <p className="text-sm text-gray-600">T: {phone}</p>
-            <p className="text-sm text-gray-600 mt-1">
-              E:{" "}
-              <a href={`mailto:${email}`} className="hover:text-green-900 hover:underline transition-colors">
-                {email}
-              </a>
-            </p>
-          </div>
-
-          {/* Track order */}
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 mb-4">Your Orders</h3>
-            <p className="text-sm text-gray-600 mb-3">Track your order status anytime using your email or payment reference.</p>
-            <Link
-              href="/track-my-order"
-              className="inline-block border border-green-900 text-green-900 text-sm px-4 py-2 hover:bg-green-900 hover:text-white transition-colors"
-            >
-              Track Order →
-            </Link>
-          </div>
+          {/* Link columns */}
+          {COLS.map(col => (
+            <div key={col.heading}>
+              <h3 className="text-sm font-bold text-gray-900 mb-4">{col.heading}</h3>
+              <ul className="space-y-2.5">
+                {col.links.map(l => (
+                  <li key={l.label}>
+                    <Link href={l.href} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-400 text-center sm:text-left">{copyright}</p>
-          <div className="flex gap-4">
-            <Link href="/contact" className="text-xs text-gray-400 hover:text-green-900 transition-colors">Contact</Link>
-            <Link href="/track-my-order" className="text-xs text-gray-400 hover:text-green-900 transition-colors">Track Order</Link>
-            <Link href="/profile" className="text-xs text-gray-400 hover:text-green-900 transition-colors">Account</Link>
-          </div>
+        <div className="border-t border-gray-200 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-xs text-gray-400">© {year} {siteName}. All rights reserved.</p>
+          <p className="text-xs text-gray-400 flex items-center gap-1">
+            Made in Lagos with <span className="text-green-600">♥</span>
+          </p>
         </div>
       </div>
     </footer>
   );
 }
-
-export default Footer;

@@ -558,3 +558,301 @@ export async function markAllNotificationsRead(userId: string): Promise<void> {
     );
     await Promise.all(snap.docs.map(d => updateDoc(d.ref, { read: true })));
 }
+
+// ── Export Commodities (client readers) ───────────────────────────────────
+
+export interface ExportCommodity {
+    id?: string;
+    name: string;
+    spec: string;           // e.g. "99% purity, FFA <2%"
+    priceMin: number;       // USD per MT
+    priceMax: number;       // USD per MT
+    moq: string;            // e.g. "25 MT"
+    catalogType: "raw" | "processed"; // which tab to show under
+    image?: string;         // optional thumbnail
+    active: boolean;
+    order: number;
+}
+
+export async function getExportCommodities(): Promise<ExportCommodity[]> {
+    const snap = await getDocs(collection(db, "exportCommodities"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as ExportCommodity))
+        .filter(c => c.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Export Quote Requests (client write) ──────────────────────────────────
+
+export interface ExportQuoteRequest {
+    id?: string;
+    name: string;
+    company?: string;
+    email: string;
+    phone?: string;
+    commodity: string;
+    quantity: string;
+    destination: string;
+    message?: string;
+    status: "new" | "contacted" | "closed";
+    createdAt?: any;
+}
+
+export async function submitExportQuote(data: Omit<ExportQuoteRequest, "id" | "status">): Promise<string> {
+    const ref = await addDoc(collection(db, "exportQuotes"), {
+        ...data,
+        status: "new",
+        createdAt: new Date().toISOString(),
+    });
+    return ref.id;
+}
+
+// ── Subscription Packages (client readers) ────────────────────────────────
+
+export interface SubscriptionPackage {
+    id?: string;
+    name: string;
+    tag: string;
+    tagColor: "green" | "orange";
+    description?: string;
+    price: number;
+    period: string;
+    items: string[];
+    active: boolean;
+    order: number;
+}
+
+export async function getSubscriptionPackages(): Promise<SubscriptionPackage[]> {
+    const snap = await getDocs(collection(db, "subscriptionPackages"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as SubscriptionPackage))
+        .filter(p => p.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Box Items (client readers) ─────────────────────────────────────────────
+
+export interface BoxItem {
+    id?: string;
+    name: string;
+    price: number;
+    active: boolean;
+    order: number;
+}
+
+export async function getBoxItems(): Promise<BoxItem[]> {
+    const snap = await getDocs(collection(db, "boxItems"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as BoxItem))
+        .filter(b => b.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Consultation Tiers (client readers) ───────────────────────────────────
+
+export interface ConsultationTier {
+    id?: string;
+    icon: string;
+    title: string;
+    subtitle: string;
+    price: number;
+    active: boolean;
+    order: number;
+}
+
+export async function getConsultationTiers(): Promise<ConsultationTier[]> {
+    const snap = await getDocs(collection(db, "consultationTiers"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as ConsultationTier))
+        .filter(t => t.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Homepage Stats (client readers) ───────────────────────────────────────
+
+export interface HomepageStat {
+    id?: string;
+    value: string;
+    label: string;
+    order: number;
+    active: boolean;
+}
+
+export async function getHomepageStats(): Promise<HomepageStat[]> {
+    const snap = await getDocs(collection(db, "homepageStats"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as HomepageStat))
+        .filter(s => s.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Food Library Categories (client readers) ──────────────────────────────
+
+export interface FoodLibraryCategory {
+    id?: string;
+    category: string;
+    items: string[];
+    note: string;
+    order: number;
+    active: boolean;
+}
+
+export async function getFoodLibraryCategories(): Promise<FoodLibraryCategory[]> {
+    const snap = await getDocs(collection(db, "foodLibrary"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as FoodLibraryCategory))
+        .filter(c => c.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Export Destinations (client readers) ──────────────────────────────────
+
+export interface ExportDestination {
+    id?: string;
+    flag: string;
+    region: string;
+    ports: string;
+    note: string;
+    order: number;
+    active: boolean;
+}
+
+export async function getExportDestinations(): Promise<ExportDestination[]> {
+    const snap = await getDocs(collection(db, "exportDestinations"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as ExportDestination))
+        .filter(d => d.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Export Hero Content ────────────────────────────────────────────────────
+
+export interface ExportHeroContent {
+    id?: string;
+    eyebrow: string;
+    headingLine1: string;
+    headingLine2: string;
+    headingAccent: string;
+    subtitle: string;
+    cta1Label: string;
+    cta2Label: string;
+    catalogFootnote: string;
+    quoteCta1Label: string;
+    quoteCta2Label: string;
+}
+
+export async function getExportHeroContent(): Promise<ExportHeroContent | null> {
+    const snap = await getDocs(collection(db, "exportHero"));
+    if (snap.empty) return null;
+    return { id: snap.docs[0].id, ...snap.docs[0].data() } as ExportHeroContent;
+}
+
+// ── Compliance Certifications ──────────────────────────────────────────────
+
+export interface ComplianceCertification {
+    id?: string;
+    title: string;
+    body: string;
+    badge: string;
+    order: number;
+    active: boolean;
+}
+
+export async function getComplianceCertifications(): Promise<ComplianceCertification[]> {
+    const snap = await getDocs(collection(db, "complianceCerts"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as ComplianceCertification))
+        .filter(c => c.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Compliance Destination Documents ──────────────────────────────────────
+
+export interface ComplianceDestination {
+    id?: string;
+    region: string;
+    docs: string[];
+    order: number;
+    active: boolean;
+}
+
+export async function getComplianceDestinations(): Promise<ComplianceDestination[]> {
+    const snap = await getDocs(collection(db, "complianceDests"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as ComplianceDestination))
+        .filter(c => c.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Compliance Hero Content ────────────────────────────────────────────────
+
+export interface ComplianceHeroContent {
+    id?: string;
+    eyebrow: string;
+    heading: string;
+    subtitle: string;
+    accrHeading: string;
+    accrSubtitle: string;
+    docsHeading: string;
+    docsSubtitle: string;
+    faqHeading: string;
+    faqSubtitle: string;
+    dueDiligenceHeading: string;
+    dueDiligenceBody: string;
+    cta1Label: string;
+    cta2Label: string;
+}
+
+export async function getComplianceHeroContent(): Promise<ComplianceHeroContent | null> {
+    const snap = await getDocs(collection(db, "complianceHero"));
+    if (snap.empty) return null;
+    return { id: snap.docs[0].id, ...snap.docs[0].data() } as ComplianceHeroContent;
+}
+
+// ── Export FAQs ────────────────────────────────────────────────────────────
+
+export interface ExportFAQ {
+    id?: string;
+    question: string;
+    answer: string;
+    order: number;
+    active: boolean;
+}
+
+export async function getExportFAQs(): Promise<ExportFAQ[]> {
+    const snap = await getDocs(collection(db, "exportFAQs"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as ExportFAQ))
+        .filter(f => f.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Homepage Hero Content ──────────────────────────────────────────────────
+
+export interface HomepageHeroContent {
+    id?: string;
+    deliveryText: string;
+    line1: string;
+    line2: string;
+    line3: string;
+    subtitle: string;
+    cta1Label: string;
+    cta1Href: string;
+    cta2Label: string;
+    cta2Href: string;
+    healthPills: string[];
+    floatingCard1Title: string;
+    floatingCard1Sub: string;
+    floatingCard2Title: string;
+    floatingCard2Sub: string;
+    heroImage: string;
+    assessmentHeading: string;
+    assessmentCta1Label: string;
+    assessmentCta2Label: string;
+}
+
+export async function getHomepageHeroContent(): Promise<HomepageHeroContent | null> {
+    const snap = await getDocs(collection(db, "homepageHero"));
+    if (snap.empty) return null;
+    return { id: snap.docs[0].id, ...snap.docs[0].data() } as HomepageHeroContent;
+}
