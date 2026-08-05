@@ -111,22 +111,21 @@ export default function ExportPage() {
       {/* ── HERO ────────────────────────────────────────────────────── */}
       <section className="pt-16 pb-12 md:pt-24 md:pb-16">
         <div className="container-max">
-          <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-6">Global Export</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-[#4ade80] mb-6">{hero.eyebrow}</p>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-end mb-12">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white leading-[1.05]">
-              Raw &amp; processed organic<br />
-              commodities —{" "}
-              <span className="text-[#4ade80]">Nigeria to<br />the world.</span>
+              {hero.headingLine1}<br />
+              {hero.headingLine2}{" "}
+              <span className="text-[#4ade80]">{hero.headingAccent}</span>
             </h1>
             <p className="text-gray-400 text-base leading-relaxed max-w-sm lg:ml-auto lg:text-right">
-              We source, process and ship certified organic Nigerian commodities to buyers across
-              Europe, USA and Asia — bulk volumes, full traceability, export-grade packaging.
+              {hero.subtitle}
             </p>
           </div>
 
           {/* Destination cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
-            {DESTINATIONS.map(d => (
+            {destinations.map(d => (
               <div key={d.region} className="bg-[#1a2e1f] rounded-2xl p-5 space-y-2 border border-white/5">
                 <span className="text-2xl">{d.flag}</span>
                 <p className="font-bold text-white text-base mt-2">{d.region}</p>
@@ -197,10 +196,7 @@ export default function ExportPage() {
             </div>
 
             <div className="px-6 py-3 border-t border-white/10">
-              <p className="text-xs text-gray-500">
-                Prices are indicative FOB Lagos / Apapa in USD and subject to market conditions, lot size and destination.
-                CIF, CFR and DDP terms available on request.
-              </p>
+              <p className="text-xs text-gray-500">{hero.catalogFootnote}</p>
             </div>
           </div>
 

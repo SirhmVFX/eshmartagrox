@@ -7,8 +7,9 @@ import { Check, ArrowRight, ChevronRight, ChevronDown, ChevronUp, Globe } from "
 import {
   getSubscriptionPackages, getBoxItems, getConsultationTiers, getHomepageStats,
   getExportCommodities, getTestimonials, getFAQs, getFoodLibraryCategories,
+  getExportDestinations, getHomepageHeroContent,
   SubscriptionPackage, BoxItem, ConsultationTier, HomepageStat, ExportCommodity,
-  Testimonial, FAQ, FoodLibraryCategory,
+  Testimonial, FAQ, FoodLibraryCategory, ExportDestination, HomepageHeroContent,
 } from "@/lib/firestore";
 
 // ── Fallback data (used until Firestore is populated) ──────────────────────
@@ -106,6 +107,27 @@ const DEFAULT_FOOD_LIBRARY: FoodLibraryCategory[] = [
   { category: "Local Dishes", items: ["Jollof rice", "Fried rice", "Moimoi", "Cooked yam", "Yam porridge (Asaro)"], note: "5 dishes · consumption advice", order: 7, active: true },
 ];
 
+const DEFAULT_HERO: HomepageHeroContent = {
+  deliveryText: "Now delivering across Lagos & Abuja",
+  line1: "Eat better.", line2: "Live longer.", line3: "Stay healthier.",
+  subtitle: "Healthy Nigerian foods and curated grocery packages designed for seniors, families, busy professionals, and students — guided by real nutrition science.",
+  cta1Label: "Shop healthy packages", cta1Href: "/shop",
+  cta2Label: "🧮 Try the nutrition calculator", cta2Href: "/calculator",
+  healthPills: ["💧 Diabetes", "💚 Blood Pressure", "📈 Cholesterol", "✨ Healthy Aging"],
+  floatingCard1Title: "AI meal plan", floatingCard1Sub: "Built around your health",
+  floatingCard2Title: "Heart-healthy ✓", floatingCard2Sub: "Low-sodium, high-fibre",
+  heroImage: "/assets/1.jpg",
+  assessmentHeading: "Take the ESHMARTAGROX assessment and get a personalised food plan.",
+  assessmentCta1Label: "Start assessment", assessmentCta2Label: "Browse packages instead",
+  consultationImage: "",
+};
+
+const DEFAULT_EXPORT_DESTINATIONS: ExportDestination[] = [
+  { flag: "🇪🇺", region: "Europe", ports: "Rotterdam · Hamburg · Antwerp", note: "EU-compliant documentation & phytosanitary certs.", order: 1, active: true },
+  { flag: "🇺🇸", region: "USA", ports: "New York · Houston · Los Angeles", note: "FDA-registered facility, USDA-aligned processing.", order: 2, active: true },
+  { flag: "🌏", region: "Asia", ports: "Shanghai · Mumbai · Singapore", note: "Bulk container freight with cold-chain options.", order: 3, active: true },
+];
+
 // ── Build-Your-Own Box ─────────────────────────────────────────────────────
 
 function BuildBox({ items }: { items: BoxItem[] }) {
@@ -177,6 +199,8 @@ export default function HomePage() {
   const [rawCommodities, setRawCommodities] = useState<ExportCommodity[]>(DEFAULT_COMMODITIES_RAW);
   const [processedCommodities, setProcessedCommodities] = useState<ExportCommodity[]>(DEFAULT_COMMODITIES_PROCESSED);
   const [foodLibrary, setFoodLibrary] = useState<FoodLibraryCategory[]>([]);
+  const [exportDests, setExportDests] = useState<ExportDestination[]>(DEFAULT_EXPORT_DESTINATIONS);
+  const [hero, setHero] = useState<HomepageHeroContent>(DEFAULT_HERO);
 
   useEffect(() => {
     getSubscriptionPackages().then(d => { if (d.length) setPackages(d); }).catch(() => { });
@@ -192,6 +216,8 @@ export default function HomePage() {
       if (processed.length) setProcessedCommodities(processed);
     }).catch(() => { });
     getFoodLibraryCategories().then(d => { if (d.length) setFoodLibrary(d); }).catch(() => { });
+    getExportDestinations().then(d => { if (d.length) setExportDests(d); }).catch(() => { });
+    getHomepageHeroContent().then(h => { if (h) setHero(h); }).catch(() => { });
   }, []);
 
   const activeCommodities = catalogTab === "raw" ? rawCommodities : processedCommodities;
@@ -202,84 +228,71 @@ export default function HomePage() {
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <section className="bg-[#FFFDF7] pt-10 pb-16 md:pb-24">
         <div className="container-max">
-          {/* Delivery pill */}
           <div className="inline-flex items-center gap-2 border border-gray-300 rounded-full px-3 py-1 text-xs text-gray-600 mb-8">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            Now delivering across Lagos &amp; Abuja
+            {hero.deliveryText}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Left: copy */}
             <div className="space-y-6">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl leading-[1.05] tracking-tight">
-                <span className="text-gray-900">Eat better.</span><br />
-                <span className="text-[#14532d]">Live longer.</span><br />
-                <span className="text-[#f97316]">Stay healthier.</span>
+                <span className="text-gray-900">{hero.line1}</span><br />
+                <span className="text-[#14532d]">{hero.line2}</span><br />
+                <span className="text-[#f97316]">{hero.line3}</span>
               </h1>
-              <p className="text-gray-600 text-base sm:text-lg max-w-md leading-relaxed">
-                Healthy Nigerian foods and curated grocery packages designed for seniors, families,
-                busy professionals, and students — guided by real nutrition science.
-              </p>
+              <p className="text-gray-600 text-base sm:text-lg max-w-md leading-relaxed">{hero.subtitle}</p>
 
-              {/* CTA buttons */}
               <div className="flex flex-wrap gap-3">
-                <Link href="/shop" className="inline-flex items-center gap-2 bg-[#14532d] text-white px-5 py-3 rounded-full font-semibold text-sm hover:bg-green-800 transition-colors">
-                  Shop healthy packages <ArrowRight size={14} />
+                <Link href={hero.cta1Href} className="inline-flex items-center gap-2 bg-[#14532d] text-white px-5 py-3 rounded-full font-semibold text-sm hover:bg-green-800 transition-colors">
+                  {hero.cta1Label} <ArrowRight size={14} />
                 </Link>
-                <Link href="/calculator" className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-5 py-3 rounded-full font-semibold text-sm hover:border-gray-500 transition-colors">
-                  🧮 Try the nutrition calculator
+                <Link href={hero.cta2Href} className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-5 py-3 rounded-full font-semibold text-sm hover:border-gray-500 transition-colors">
+                  {hero.cta2Label}
                 </Link>
               </div>
 
-              {/* Health pills */}
               <div className="flex flex-wrap gap-2 pt-1">
-                {[
-                  { icon: "💧", label: "Diabetes" },
-                  { icon: "💚", label: "Blood Pressure" },
-                  { icon: "📈", label: "Cholesterol" },
-                  { icon: "✨", label: "Healthy Aging" },
-                ].map(p => (
-                  <span key={p.label} className="inline-flex items-center gap-1.5 border border-gray-200 rounded-full px-3 py-1 text-xs text-gray-600">
-                    {p.icon} {p.label}
+                {hero.healthPills.map(pill => (
+                  <span key={pill} className="inline-flex items-center gap-1.5 border border-gray-200 rounded-full px-3 py-1 text-xs text-gray-600">
+                    {pill}
                   </span>
                 ))}
-              </div>
 
-              {/* Stats */}
-              <div className="flex flex-wrap gap-8 pt-2">
-                {[["12k+", "Meals delivered"], ["97%", "Subscriber retention"], ["50+", "Nutritionist recipes"]].map(([v, l]) => (
-                  <div key={l}>
-                    <p className="text-2xl font-bold text-gray-900">{v}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{l}</p>
-                  </div>
-                ))}
+                {/* Stats */}
+                <div className="flex flex-wrap gap-8 pt-2">
+                  {[["12k+", "Meals delivered"], ["97%", "Subscriber retention"], ["50+", "Nutritionist recipes"]].map(([v, l]) => (
+                    <div key={l}>
+                      <p className="text-2xl font-bold text-gray-900">{v}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{l}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Right: image with floating cards */}
             <div className="relative max-w-lg mx-auto lg:mx-0 lg:ml-auto w-full">
               <div className="relative aspect-square rounded-2xl overflow-hidden">
-                <Image src="/assets/1.jpg" alt="Healthy Nigerian food" fill className="object-cover" priority />
+                <Image src={hero.heroImage || "/assets/1.jpg"} alt="Healthy Nigerian food" fill className="object-cover" priority />
               </div>
-              {/* Top-right card */}
               <div className="absolute top-4 right-4 bg-white rounded-xl border border-gray-100 px-3 py-2 flex items-center gap-2 text-xs">
                 <span className="text-[#14532d] font-bold">✦</span>
                 <div>
-                  <p className="font-bold text-gray-900 text-xs">AI meal plan</p>
-                  <p className="text-gray-400 text-[10px]">Built around your health</p>
+                  <p className="font-bold text-gray-900 text-xs">{hero.floatingCard1Title}</p>
+                  <p className="text-gray-400 text-[10px]">{hero.floatingCard1Sub}</p>
                 </div>
               </div>
-              {/* Bottom-left card */}
               <div className="absolute bottom-4 left-4 bg-white rounded-xl border border-gray-100 px-3 py-2 flex items-center gap-2 text-xs">
                 <span className="text-green-500 text-base">💚</span>
                 <div>
-                  <p className="font-semibold text-gray-900 text-xs">Heart-healthy ✓</p>
-                  <p className="text-gray-400 text-[10px]">Low-sodium, high-fibre</p>
+                  <p className="font-semibold text-gray-900 text-xs">{hero.floatingCard2Title}</p>
+                  <p className="text-gray-400 text-[10px]">{hero.floatingCard2Sub}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
       </section>
 
       {/* ── GROCERY PACKAGES ─────────────────────────────────────────── */}
@@ -382,7 +395,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden rounded-2xl">
             {/* Left: image */}
             <div className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-0">
-              <Image src="/assets/2.jpg" alt="Nigerian nutritionist" fill className="object-cover" />
+              <Image src={hero.consultationImage || "/assets/2.jpg"} alt="Nigerian nutritionist" fill className="object-cover" />
             </div>
             {/* Right: content */}
             <div className="bg-[#14532d] p-6 sm:p-8 md:p-12 flex flex-col justify-center space-y-5">
@@ -439,11 +452,7 @@ export default function HomePage() {
 
           {/* Destination cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            {[
-              { flag: "🇪🇺", region: "Europe", ports: "Rotterdam · Hamburg · Antwerp", note: "EU-compliant documentation & phytosanitary certs." },
-              { flag: "🇺🇸", region: "USA", ports: "New York · Houston · Los Angeles", note: "FDA-registered facility, USDA-aligned processing." },
-              { flag: "🌏", region: "Asia", ports: "Shanghai · Mumbai · Singapore", note: "Bulk container freight with cold-chain options." },
-            ].map(d => (
+            {exportDests.map(d => (
               <div key={d.region} className="bg-[#1a2e1f] rounded-2xl p-5 space-y-2">
                 <span className="text-2xl">{d.flag}</span>
                 <p className="font-bold text-white">{d.region}</p>
@@ -561,15 +570,15 @@ export default function HomePage() {
             <div className="space-y-2">
               <p className="text-[#7c2800] text-xs font-bold uppercase tracking-widest">Free · 3 minutes</p>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl text-[#0d1b12] leading-tight font-bold">
-                Take the ESHMARTAGROX assessment and get a personalised food plan.
+                {hero.assessmentHeading}
               </h2>
             </div>
             <div className="flex flex-col gap-3 lg:items-end">
               <Link href="/calculator" className="bg-[#0d1b12] text-white px-8 py-3.5 rounded-full font-bold text-sm hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 w-full lg:w-72">
-                Start assessment <ArrowRight size={14} />
+                {hero.assessmentCta1Label} <ArrowRight size={14} />
               </Link>
               <Link href="/shop" className="bg-[#f97316]/20 text-[#7c2800] border border-[#f97316]/40 px-8 py-3.5 rounded-full font-bold text-sm hover:bg-[#f97316]/30 transition-colors flex items-center justify-center w-full lg:w-72">
-                Browse packages instead
+                {hero.assessmentCta2Label}
               </Link>
             </div>
           </div>

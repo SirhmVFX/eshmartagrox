@@ -4,72 +4,49 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { Minus, Plus, Check } from "lucide-react";
-import { getProducts, getSiteSettings, FirestoreProduct } from "@/lib/firestore";
+import {
+  getProducts, getSiteSettings, FirestoreProduct,
+  getSubscriptionPackages, getBoxItems,
+  SubscriptionPackage, BoxItem,
+} from "@/lib/firestore";
 import { useCurrency } from "@/lib/currency";
 import { useCart } from "@/lib/cart";
 
-// ── Subscription packages ─────────────────────────────────────────────────
+// ── Fallback data (used until Firestore is populated) ─────────────────────
 
-const PACKAGES = [
-  {
-    tag: "Most loved",
-    name: "Senior Wellness",
-    price: 28500,
-    period: "/ week",
-    items: ["Fresh ugu, spinach & garden eggs", "Ofada / brown rice", "Beans & soybeans", "Fish & lean protein", "Seasonal fruits"],
-    highlight: true,
-  },
-  {
-    tag: "Best value",
-    name: "Family of Four",
-    price: 92000,
-    period: "/ month",
-    items: ["Rice, yam & plantain", "Beans & legumes", "Fish & chicken", "Vegetables & fruits weekly", "Free delivery & swap"],
-  },
-  {
-    tag: "Campus-ready",
-    name: "Student Smart Pack",
-    price: 14900,
-    period: "/ week",
-    items: ["Rice, noodles & spaghetti", "Eggs & beans", "Tomatoes & vegetables", "Quick-prep proteins"],
-  },
-  {
-    tag: "Meal-prep ready",
-    name: "Working Professional",
-    price: 22400,
-    period: "/ week",
-    items: ["Lean proteins", "Smart carbs", "Salad & greens", "Healthy snacks"],
-  },
+const DEFAULT_PACKAGES: SubscriptionPackage[] = [
+  { name: "Senior Wellness", tag: "Most loved", tagColor: "green", price: 28500, period: "/ week", items: ["Fresh ugu, spinach & garden eggs", "Ofada / brown rice", "Beans & soybeans", "Fish & lean protein", "Seasonal fruits"], active: true, order: 1 },
+  { name: "Family of Four", tag: "Best value", tagColor: "orange", price: 92000, period: "/ month", items: ["Rice, yam & plantain", "Beans & legumes", "Fish & chicken", "Vegetables & fruits weekly", "Free delivery & swap"], active: true, order: 2 },
+  { name: "Student Smart Pack", tag: "Campus-ready", tagColor: "green", price: 14900, period: "/ week", items: ["Rice, noodles & spaghetti", "Eggs & beans", "Tomatoes & vegetables", "Quick-prep proteins"], active: true, order: 3 },
+  { name: "Working Professional", tag: "Meal-prep ready", tagColor: "green", price: 22400, period: "/ week", items: ["Lean proteins", "Smart carbs", "Salad & greens", "Healthy snacks"], active: true, order: 4 },
 ];
 
-// ── Build-your-own box items ──────────────────────────────────────────────
-
-const BOX_ITEMS = [
-  { name: "Ofada rice (5kg)", price: 9500 },
-  { name: "Brown rice (5kg)", price: 11000 },
-  { name: "Honey beans (2kg)", price: 4500 },
-  { name: "Yam tubers (3 pcs)", price: 7800 },
-  { name: "Plantain bunch", price: 3500 },
-  { name: "Instant noodles (carton · 40 packs)", price: 7200 },
-  { name: "Spaghetti (pack of 10)", price: 6500 },
-  { name: "Macaroni (pack of 10)", price: 6200 },
-  { name: "Ugu & spinach bundle", price: 2200 },
-  { name: "Fresh tomato & pepper", price: 3800 },
-  { name: "Titus fish (1kg)", price: 6500 },
-  { name: "Croaker fish (1kg)", price: 8200 },
-  { name: "Chicken (whole)", price: 9800 },
-  { name: "Goat meat (1kg)", price: 8500 },
-  { name: "Crate of eggs (30)", price: 5200 },
-  { name: "Oats (1kg)", price: 3200 },
-  { name: "Seasonal fruit basket", price: 6800 },
-  { name: "Palm oil (2L)", price: 5500 },
-  { name: "Egusi & crayfish pack", price: 4200 },
-  { name: "Seasoning cubes (pack · 100 pcs)", price: 2800 },
-  { name: "Curry & thyme combo", price: 1800 },
-  { name: "Ginger & garlic paste (500g)", price: 1500 },
-  { name: "Dry pepper (ground · 500g)", price: 2200 },
-  { name: "Stockfish (medium bundle)", price: 8500 },
-  { name: "Dry fish (smoked · 1kg)", price: 9500 },
+const DEFAULT_BOX_ITEMS: BoxItem[] = [
+  { name: "Ofada rice (5kg)", price: 9500, active: true, order: 1 },
+  { name: "Brown rice (5kg)", price: 11000, active: true, order: 2 },
+  { name: "Honey beans (2kg)", price: 4500, active: true, order: 3 },
+  { name: "Yam tubers (3 pcs)", price: 7800, active: true, order: 4 },
+  { name: "Plantain bunch", price: 3500, active: true, order: 5 },
+  { name: "Instant noodles (carton · 40 packs)", price: 7200, active: true, order: 6 },
+  { name: "Spaghetti (pack of 10)", price: 6500, active: true, order: 7 },
+  { name: "Macaroni (pack of 10)", price: 6200, active: true, order: 8 },
+  { name: "Ugu & spinach bundle", price: 2200, active: true, order: 9 },
+  { name: "Fresh tomato & pepper", price: 3800, active: true, order: 10 },
+  { name: "Titus fish (1kg)", price: 6500, active: true, order: 11 },
+  { name: "Croaker fish (1kg)", price: 8200, active: true, order: 12 },
+  { name: "Chicken (whole)", price: 9800, active: true, order: 13 },
+  { name: "Goat meat (1kg)", price: 8500, active: true, order: 14 },
+  { name: "Crate of eggs (30)", price: 5200, active: true, order: 15 },
+  { name: "Oats (1kg)", price: 3200, active: true, order: 16 },
+  { name: "Seasonal fruit basket", price: 6800, active: true, order: 17 },
+  { name: "Palm oil (2L)", price: 5500, active: true, order: 18 },
+  { name: "Egusi & crayfish pack", price: 4200, active: true, order: 19 },
+  { name: "Seasoning cubes (pack · 100 pcs)", price: 2800, active: true, order: 20 },
+  { name: "Curry & thyme combo", price: 1800, active: true, order: 21 },
+  { name: "Ginger & garlic paste (500g)", price: 1500, active: true, order: 22 },
+  { name: "Dry pepper (ground · 500g)", price: 2200, active: true, order: 23 },
+  { name: "Stockfish (medium bundle)", price: 8500, active: true, order: 24 },
+  { name: "Dry fish (smoked · 1kg)", price: 9500, active: true, order: 25 },
 ];
 
 // ── Filter section ─────────────────────────────────────────────────────────
@@ -100,17 +77,17 @@ function FilterSection({ title, options, selected, onChange }: {
 
 // ── Build-Your-Own Box component ───────────────────────────────────────────
 
-function BuildBox() {
+function BuildBox({ items }: { items: BoxItem[] }) {
   const { format } = useCurrency();
   const { add } = useCart();
   const [qty, setQty] = useState<Record<number, number>>({});
   const [added, setAdded] = useState(false);
 
-  const total = BOX_ITEMS.reduce((sum, it, i) => sum + (qty[i] ?? 0) * it.price, 0);
+  const total = items.reduce((sum, it, i) => sum + (qty[i] ?? 0) * it.price, 0);
   const itemCount = Object.values(qty).reduce((s, q) => s + q, 0);
 
   const handleAddBox = () => {
-    BOX_ITEMS.forEach((item, i) => {
+    items.forEach((item, i) => {
       const q = qty[i] ?? 0;
       if (q > 0) add({ id: `box-${i}`, name: item.name, price: item.price, quantity: q });
     });
@@ -128,7 +105,7 @@ function BuildBox() {
         Pick exactly the groceries and proteins you want. Adjust quantities, see your live total, and we&apos;ll hand-pack and deliver it.
       </p>
       <div className="max-h-80 overflow-y-auto divide-y divide-gray-100">
-        {BOX_ITEMS.map((item, i) => (
+        {items.map((item, i) => (
           <div key={i} className="flex items-center gap-2 px-4 py-2.5">
             <div className="flex-1 min-w-0">
               <p className="text-sm text-gray-800 truncate">{item.name}</p>
@@ -169,6 +146,8 @@ function BuildBox() {
 
 export default function Shop() {
   const [products, setProducts] = useState<FirestoreProduct[]>([]);
+  const [packages, setPackages] = useState<SubscriptionPackage[]>(DEFAULT_PACKAGES);
+  const [boxItems, setBoxItems] = useState<BoxItem[]>(DEFAULT_BOX_ITEMS);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -187,7 +166,8 @@ export default function Shop() {
       })
       .catch(() => { })
       .finally(() => setLoading(false));
-
+    getSubscriptionPackages().then(d => { if (d.length) setPackages(d); }).catch(() => { });
+    getBoxItems().then(d => { if (d.length) setBoxItems(d); }).catch(() => { });
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const q = params.get("q")?.trim() ?? "";
@@ -253,8 +233,8 @@ export default function Shop() {
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {PACKAGES.map(pkg => {
-                const tagColor = pkg.tag === "Best value" ? "bg-[#f97316] text-white" : "bg-[#14532d] text-white";
+              {packages.map(pkg => {
+                const tagColor = pkg.tagColor === "orange" ? "bg-[#f97316] text-white" : "bg-[#14532d] text-white";
                 return (
                   <div key={pkg.name} className="bg-white rounded-2xl p-5 flex flex-col gap-3 border border-gray-100">
                     <div className="flex items-start justify-between gap-2">
@@ -295,7 +275,7 @@ export default function Shop() {
                 and we&apos;ll hand-pack and deliver it.
               </p>
             </div>
-            <BuildBox />
+            <BuildBox items={boxItems} />
           </div>
         )}
 

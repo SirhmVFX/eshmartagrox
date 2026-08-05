@@ -849,6 +849,7 @@ export interface HomepageHeroContent {
     assessmentHeading: string;
     assessmentCta1Label: string;
     assessmentCta2Label: string;
+    consultationImage?: string;  // left-side photo in the Nutrition Consultations section
 }
 
 export async function getHomepageHeroContent(): Promise<HomepageHeroContent | null> {
