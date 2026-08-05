@@ -204,7 +204,7 @@ export default function Shop() {
       </div>
 
       {/* Tab navigation */}
-      <div className="border-b border-gray-200 bg-white sticky top-[68px] z-30">
+      <div className="border-b border-gray-200 bg-white sticky top-17 z-30">
         <div className="container-max flex overflow-x-auto">
           {TABS.map(t => (
             <button

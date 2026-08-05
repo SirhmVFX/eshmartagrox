@@ -311,9 +311,9 @@ export default function HomePage() {
               <p className="text-gray-600 text-sm leading-relaxed">
                 Subscribe weekly, bi-weekly or monthly. Cancel anytime. Every order is hand-packed and delivered chilled across Lagos &amp; Abuja.
               </p>
-              <div className="relative aspect-[3/4] rounded-2xl overflow-hidden max-w-xs">
+              <div className="relative aspect-3/4 rounded-2xl overflow-hidden max-w-xs">
                 <Image src="/assets/3.jpg" alt="Nigerian groceries" fill className="object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/60 to-transparent p-4">
                   <p className="text-white font-bold text-sm">Hand-packed, doctor-approved, delivered to your door.</p>
                   <p className="text-white/70 text-xs mt-1">🛵 Same-day in Lagos · Next-day in Abuja</p>
                 </div>
@@ -394,7 +394,7 @@ export default function HomePage() {
         <div className="container-max">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden rounded-2xl">
             {/* Left: image */}
-            <div className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-0">
+            <div className="relative min-h-70 sm:min-h-90 lg:min-h-0">
               <Image src={hero.consultationImage || "/assets/2.jpg"} alt="Nigerian nutritionist" fill className="object-cover" />
             </div>
             {/* Right: content */}
