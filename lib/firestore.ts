@@ -925,3 +925,30 @@ export async function getAboutPageContent(): Promise<AboutPageContent> {
     if (snap.empty) return DEFAULT_ABOUT;
     return { id: snap.docs[0].id, ...snap.docs[0].data() } as AboutPageContent;
 }
+
+// ── Nutritionists ──────────────────────────────────────────────────────────
+
+export interface NutritionistTier {
+    icon: string;
+    title: string;
+    subtitle: string;
+    price: number;
+}
+
+export interface Nutritionist {
+    id?: string;
+    name: string;
+    designation: string;
+    photo: string;
+    tiers: NutritionistTier[];
+    active: boolean;
+    order: number;
+}
+
+export async function getNutritionists(): Promise<Nutritionist[]> {
+    const snap = await getDocs(collection(db, "nutritionists"));
+    return snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as Nutritionist))
+        .filter(n => n.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}

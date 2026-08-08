@@ -87,10 +87,14 @@ function Header() {
 
         {/* Logo */}
         <Link href="/" className="shrink-0">
-          <div className="w-16 h-16 md:w-20 md:h-20 relative">
-            {settings.logoUrl
-              ? <Image src={settings.logoUrl} alt={settings.siteName} fill className="object-contain" />
-              : <Image src="/assets/eshmartlogo.png" alt="Eshmart Agrox" width={80} height={80} className="w-full h-full object-contain" />}
+          <div className="w-20 h-20 md:w-24 md:h-24 relative">
+            {isExport ? (
+              <Image src="/assets/eshmartlogowhite.png" alt="Eshmart Agrox" width={96} height={96} className="w-full h-full object-contain" />
+            ) : settings.logoUrl ? (
+              <Image src={settings.logoUrl} alt={settings.siteName} fill className="object-contain" />
+            ) : (
+              <Image src="/assets/eshmartlogo.png" alt="Eshmart Agrox" width={96} height={96} className="w-full h-full object-contain" />
+            )}
           </div>
         </Link>
 
@@ -101,8 +105,8 @@ function Header() {
               key={l.href}
               href={l.href}
               className={`px-3 py-1.5 text-sm font-medium transition-colors ${isExport
-                  ? "text-white/80 hover:text-white"
-                  : "text-gray-700 hover:text-green-900"
+                ? "text-white/80 hover:text-white"
+                : "text-gray-700 hover:text-green-900"
                 } ${pathname === l.href ? (isExport ? "text-white" : "text-green-900 border-b-2 border-green-900") : ""}`}
             >
               {l.label}

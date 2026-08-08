@@ -7,9 +7,9 @@ import { Check, ArrowRight, ChevronRight, ChevronDown, ChevronUp, Globe } from "
 import {
   getSubscriptionPackages, getBoxItems, getConsultationTiers, getHomepageStats,
   getExportCommodities, getTestimonials, getFAQs, getFoodLibraryCategories,
-  getExportDestinations, getHomepageHeroContent,
+  getExportDestinations, getHomepageHeroContent, getNutritionists,
   SubscriptionPackage, BoxItem, ConsultationTier, HomepageStat, ExportCommodity,
-  Testimonial, FAQ, FoodLibraryCategory, ExportDestination, HomepageHeroContent,
+  Testimonial, FAQ, FoodLibraryCategory, ExportDestination, HomepageHeroContent, Nutritionist,
 } from "@/lib/firestore";
 
 // ── Fallback data (used until Firestore is populated) ──────────────────────
@@ -192,6 +192,8 @@ export default function HomePage() {
   const [packages, setPackages] = useState<SubscriptionPackage[]>(DEFAULT_PACKAGES);
   const [boxItems, setBoxItems] = useState<BoxItem[]>(DEFAULT_BOX_ITEMS);
   const [consultations, setConsultations] = useState<ConsultationTier[]>(DEFAULT_CONSULTATIONS);
+  const [nutritionists, setNutritionists] = useState<Nutritionist[]>([]);
+  const [nutSlide, setNutSlide] = useState(0);
   const [stats, setStats] = useState<HomepageStat[]>(DEFAULT_STATS);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS);
   const [faqs, setFaqs] = useState<FAQ[]>(DEFAULT_FAQS);
@@ -206,6 +208,7 @@ export default function HomePage() {
     getSubscriptionPackages().then(d => { if (d.length) setPackages(d); }).catch(() => { });
     getBoxItems().then(d => { if (d.length) setBoxItems(d); }).catch(() => { });
     getConsultationTiers().then(d => { if (d.length) setConsultations(d); }).catch(() => { });
+    getNutritionists().then(d => { if (d.length) setNutritionists(d); }).catch(() => { });
     getHomepageStats().then(d => { if (d.length) setStats(d); }).catch(() => { });
     getTestimonials().then(d => { if (d.length) setTestimonials(d); }).catch(() => { });
     getFAQs().then(d => { if (d.length) setFaqs(d); }).catch(() => { });
@@ -392,43 +395,141 @@ export default function HomePage() {
       {/* ── NUTRITION CONSULTATIONS ──────────────────────────────────── */}
       <section className="bg-[#14532d] py-16 md:py-24">
         <div className="container-max">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden rounded-2xl">
-            {/* Left: image */}
-            <div className="relative min-h-70 sm:min-h-90 lg:min-h-0">
-              <Image src={hero.consultationImage || "/assets/2.jpg"} alt="Nigerian nutritionist" fill className="object-cover" />
-            </div>
-            {/* Right: content */}
-            <div className="bg-[#14532d] p-6 sm:p-8 md:p-12 flex flex-col justify-center space-y-5">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#f97316]">Nutrition Consultations</p>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl text-white leading-tight">
-                Talk to a Nigerian<br />nutritionist who{" "}
-                <span className="text-[#f97316]">gets it.</span>
-              </h2>
-              <p className="text-green-200 text-sm leading-relaxed">
-                Personal guidance for diabetes, blood pressure, cholesterol and healthy aging — by phone, WhatsApp or video.
-              </p>
-              <div className="space-y-3">
-                {consultations.map(t => (
-                  <div key={t.title} className="flex items-center justify-between bg-white/10 rounded-xl px-4 py-3 hover:bg-white/15 cursor-pointer transition-colors">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{t.icon}</span>
-                      <div>
-                        <p className="text-white font-semibold text-sm">{t.title}</p>
-                        <p className="text-green-300 text-xs">{t.subtitle}</p>
+          {nutritionists.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden rounded-2xl">
+
+              {/* ── LEFT: Nutritionist slideshow ── */}
+              <div className="relative bg-[#0d3320] flex flex-col min-h-[420px] lg:min-h-0">
+                {/* Photo */}
+                <div className="relative flex-1 min-h-80 sm:min-h-96 lg:min-h-0">
+                  {nutritionists[nutSlide]?.photo ? (
+                    <Image
+                      key={nutSlide}
+                      src={nutritionists[nutSlide].photo}
+                      alt={nutritionists[nutSlide].name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full min-h-80 flex items-center justify-center text-8xl text-white/10 bg-[#0a2a18]">👤</div>
+                  )}
+
+                  {/* Dark gradient + name/designation overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-10">
+                    <p className="text-white font-bold text-xl leading-tight">{nutritionists[nutSlide]?.name}</p>
+                    <p className="text-[#f97316] text-sm font-medium mt-0.5">{nutritionists[nutSlide]?.designation}</p>
+                  </div>
+
+                  {/* Arrow buttons — always on the photo, large and obvious */}
+                  {nutritionists.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => setNutSlide(s => (s === 0 ? nutritionists.length - 1 : s - 1))}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 bg-black/50 hover:bg-black/75 text-white flex items-center justify-center transition-colors z-10 text-2xl font-bold"
+                        aria-label="Previous nutritionist"
+                      >‹</button>
+                      <button
+                        onClick={() => setNutSlide(s => (s === nutritionists.length - 1 ? 0 : s + 1))}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 bg-black/50 hover:bg-black/75 text-white flex items-center justify-center transition-colors z-10 text-2xl font-bold"
+                        aria-label="Next nutritionist"
+                      >›</button>
+                    </>
+                  )}
+                </div>
+
+                {/* Dot indicators */}
+                {nutritionists.length > 1 && (
+                  <div className="flex items-center justify-center gap-2 py-4 bg-[#0d3320]">
+                    {nutritionists.map((n, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setNutSlide(i)}
+                        title={n.name}
+                        className={`transition-all rounded-full ${i === nutSlide ? "bg-[#f97316] w-6 h-2.5" : "bg-white/25 hover:bg-white/45 w-2.5 h-2.5"}`}
+                        aria-label={n.name}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* ── RIGHT: Content — tiers change per nutritionist ── */}
+              <div className="bg-[#14532d] p-6 sm:p-8 md:p-12 flex flex-col justify-center space-y-5">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#f97316]">Nutrition Consultations</p>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl text-white leading-tight">
+                  Talk to a Nigerian<br />nutritionist who{" "}
+                  <span className="text-[#f97316]">gets it.</span>
+                </h2>
+                <p className="text-green-200 text-sm leading-relaxed">
+                  Personal guidance for diabetes, blood pressure, cholesterol and healthy aging — by phone, WhatsApp or video.
+                </p>
+
+                {/* Pricing tiers — per nutritionist */}
+                <div className="space-y-3">
+                  {(nutritionists[nutSlide]?.tiers?.length
+                    ? nutritionists[nutSlide].tiers
+                    : consultations
+                  ).map((t, i) => (
+                    <div key={i} className="flex items-center justify-between bg-white/10 rounded-xl px-4 py-3 hover:bg-white/15 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{t.icon}</span>
+                        <div>
+                          <p className="text-white font-semibold text-sm">{t.title}</p>
+                          <p className="text-green-300 text-xs">{t.subtitle}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-bold text-sm">₦{t.price.toLocaleString()}</span>
+                        <ChevronRight size={14} className="text-green-300" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-white font-bold text-sm">₦{t.price.toLocaleString()}</span>
-                      <ChevronRight size={14} className="text-green-300" />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                <Link href="/book-online" className="inline-flex items-center gap-2 bg-white text-[#14532d] px-6 py-3 rounded-full font-bold text-sm hover:bg-gray-100 transition-colors w-fit">
+                  Book a consultation <ArrowRight size={14} />
+                </Link>
               </div>
-              <Link href="/book-online" className="inline-flex items-center gap-2 bg-white text-[#14532d] px-6 py-3 rounded-full font-bold text-sm hover:bg-gray-100 transition-colors w-fit">
-                Book a consultation <ArrowRight size={14} />
-              </Link>
             </div>
-          </div>
+          ) : (
+            /* Fallback: no nutritionists — show static layout */
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 overflow-hidden rounded-2xl">
+              <div className="relative min-h-72 sm:min-h-96 lg:min-h-0">
+                <Image src={hero.consultationImage || "/assets/2.jpg"} alt="Nigerian nutritionist" fill className="object-cover" />
+              </div>
+              <div className="bg-[#14532d] p-6 sm:p-8 md:p-12 flex flex-col justify-center space-y-5">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#f97316]">Nutrition Consultations</p>
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl text-white leading-tight">
+                  Talk to a Nigerian<br />nutritionist who{" "}
+                  <span className="text-[#f97316]">gets it.</span>
+                </h2>
+                <p className="text-green-200 text-sm leading-relaxed">
+                  Personal guidance for diabetes, blood pressure, cholesterol and healthy aging — by phone, WhatsApp or video.
+                </p>
+                <div className="space-y-3">
+                  {consultations.map(t => (
+                    <div key={t.title} className="flex items-center justify-between bg-white/10 rounded-xl px-4 py-3 hover:bg-white/15 cursor-pointer transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{t.icon}</span>
+                        <div>
+                          <p className="text-white font-semibold text-sm">{t.title}</p>
+                          <p className="text-green-300 text-xs">{t.subtitle}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-bold text-sm">₦{t.price.toLocaleString()}</span>
+                        <ChevronRight size={14} className="text-green-300" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/book-online" className="inline-flex items-center gap-2 bg-white text-[#14532d] px-6 py-3 rounded-full font-bold text-sm hover:bg-gray-100 transition-colors w-fit">
+                  Book a consultation <ArrowRight size={14} />
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
