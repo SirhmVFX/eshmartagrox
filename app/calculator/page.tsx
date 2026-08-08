@@ -144,17 +144,49 @@ export default function CalculatorPage() {
 
   const score = useMemo(() => {
     if (!rows.length) return 0;
-    let s = 70;
-    if (totals.fibre >= 20) s += 10;
-    if (totals.sodium > 2000) s -= 15;
-    if (totals.sugar > 40) s -= 10;
-    if (totals.gl > 30) s -= 10;
-    if (totals.protein >= 15) s += 5;
-    if (totals.fat > 60) s -= 5;
-    return Math.max(0, Math.min(100, Math.round(s)));
-  }, [totals, rows]);
 
-  const scoreLabel = score >= 85 ? "Excellent meal balance!" : score >= 70 ? "Decent — see suggestions below" : score >= 50 ? "Some improvements needed" : "High risk — review ingredients";
+    // Use goal-specific thresholds if a goal is selected, otherwise use general defaults
+    const maxSodium = selectedGoal?.maxSodium ?? 2300;
+    const maxSugar = selectedGoal?.maxSugar ?? 50;
+    const maxGL = selectedGoal?.maxGL ?? 35;
+    const maxFat = selectedGoal?.maxFat ?? 70;
+    const maxCal = selectedGoal?.maxCal ?? 2200;
+    const minFibre = selectedGoal?.minFibre ?? 20;
+
+    let s = 70; // baseline
+
+    // Positive signals
+    if (totals.fibre >= minFibre) s += 12;
+    else if (totals.fibre >= minFibre / 2) s += 5;
+
+    if (totals.protein >= 15) s += 5;
+    if (totals.protein >= 25) s += 3; // bonus for high protein
+
+    // Negative signals — scaled against the goal's specific limits
+    if (totals.sodium > maxSodium) s -= 15;
+    else if (totals.sodium > maxSodium * 0.8) s -= 7;
+
+    if (totals.sugar > maxSugar) s -= 12;
+    else if (totals.sugar > maxSugar * 0.75) s -= 5;
+
+    if (totals.gl > maxGL) s -= 12;
+    else if (totals.gl > maxGL * 0.8) s -= 5;
+
+    if (totals.fat > maxFat) s -= 8;
+    else if (totals.fat > maxFat * 0.85) s -= 3;
+
+    if (totals.cal > maxCal) s -= 10;
+    else if (totals.cal > maxCal * 0.9) s -= 4;
+
+    return Math.max(0, Math.min(100, Math.round(s)));
+  }, [rows, totals, selectedGoal]);
+
+  const scoreLabel = score >= 90 ? "Outstanding — ideal for your goal!" :
+    score >= 80 ? "Excellent meal balance!" :
+      score >= 70 ? "Good — small improvements possible" :
+        score >= 55 ? "Decent — see suggestions below" :
+          score >= 40 ? "Some improvements needed" :
+            "High risk — review ingredients";
 
   const filtered = ALL_FOODS.filter(f =>
     f.name.toLowerCase().includes(search.toLowerCase())
@@ -293,18 +325,73 @@ export default function CalculatorPage() {
           </div>
 
           {/* ── RIGHT: Sticky panel ── */}
-          <div className="lg:col-span-2 order-first lg:order-last">
+          <div className="lg:col-span-2">
             <div className="lg:sticky lg:top-24 space-y-4">
 
               {/* Nutrition Score */}
-              <div className="bg-[#14532d] rounded-2xl p-5 text-white">
+              <div className={`rounded-2xl p-5 text-white transition-colors ${score >= 80 ? "bg-[#14532d]" :
+                  score >= 60 ? "bg-green-700" :
+                    score >= 40 ? "bg-amber-600" :
+                      rows.length ? "bg-red-700" : "bg-[#14532d]"
+                }`}>
                 <p className="text-xs font-bold uppercase tracking-widest text-green-300 mb-2">Nutrition Score</p>
                 <div className="flex items-end gap-2">
                   <span className="text-6xl font-bold">{rows.length ? score : "—"}</span>
                   {rows.length > 0 && <span className="text-2xl text-green-300 mb-1">/100</span>}
                 </div>
-                {rows.length > 0 && <p className="text-green-200 text-sm mt-1">{scoreLabel}</p>}
+                {rows.length > 0 ? (
+                  <p className="text-green-200 text-sm mt-1">{scoreLabel}</p>
+                ) : (
+                  <p className="text-green-300/60 text-sm mt-1">
+                    {selectedGoal
+                      ? `Goal set: ${selectedGoal.label}. Now add ingredients to calculate.`
+                      : "Select a health goal and add ingredients to see your score."}
+                  </p>
+                )}
+                {/* Mini progress bar */}
+                {rows.length > 0 && (
+                  <div className="mt-3 bg-white/20 rounded-full h-1.5">
+                    <div
+                      className="h-1.5 rounded-full bg-white transition-all duration-500"
+                      style={{ width: `${score}%` }}
+                    />
+                  </div>
+                )}
               </div>
+
+              {/* Goal summary — shown as soon as a goal is selected */}
+              {selectedGoal && (
+                <div className="bg-white rounded-2xl border border-gray-200 p-5">
+                  <p className="font-bold text-gray-900 text-sm mb-3">
+                    {selectedGoal.icon} {selectedGoal.label} — Daily Limits
+                  </p>
+                  <div className="space-y-1.5 text-xs text-gray-600">
+                    <div className="flex justify-between"><span>Max Calories</span><span className="font-semibold text-gray-800">{selectedGoal.maxCal} kcal</span></div>
+                    <div className="flex justify-between"><span>Max Sodium</span><span className="font-semibold text-gray-800">{selectedGoal.maxSodium} mg</span></div>
+                    <div className="flex justify-between"><span>Max Sugar</span><span className="font-semibold text-gray-800">{selectedGoal.maxSugar} g</span></div>
+                    <div className="flex justify-between"><span>Max Fat</span><span className="font-semibold text-gray-800">{selectedGoal.maxFat} g</span></div>
+                    <div className="flex justify-between"><span>Min Fibre</span><span className="font-semibold text-gray-800">{selectedGoal.minFibre} g</span></div>
+                    <div className="flex justify-between"><span>Max Glycemic Load</span><span className="font-semibold text-gray-800">{selectedGoal.maxGL}</span></div>
+                  </div>
+                </div>
+              )}
+
+              {/* Empty state prompt */}
+              {rows.length === 0 && !selectedGoal && (
+                <div className="bg-white rounded-2xl border border-dashed border-gray-300 p-6 text-center">
+                  <p className="text-3xl mb-2">🥗</p>
+                  <p className="text-sm font-medium text-gray-700 mb-1">Start by selecting a health goal</p>
+                  <p className="text-xs text-gray-400">Then add your Nigerian meal ingredients to get instant nutrition analysis.</p>
+                </div>
+              )}
+
+              {rows.length === 0 && selectedGoal && (
+                <div className="bg-white rounded-2xl border border-dashed border-green-300 p-6 text-center">
+                  <p className="text-3xl mb-2">➕</p>
+                  <p className="text-sm font-medium text-gray-700 mb-1">Now add ingredients</p>
+                  <p className="text-xs text-gray-400">Click "Add Nigerian ingredient" and build your meal to see the nutrition score and health alerts.</p>
+                </div>
+              )}
 
               {/* Nutrition Facts */}
               {rows.length > 0 && (
@@ -323,7 +410,8 @@ export default function CalculatorPage() {
                       ["Potassium", `${Math.round(totals.potassium)} mg`, false],
                       ["Glycemic Load", `${Math.round(totals.gl)}`, true],
                     ].map(([label, val, bold]) => (
-                      <div key={label as string} className={`flex items-center justify-between border-b border-gray-100 pb-1.5 last:border-0 last:pb-0 ${bold ? "font-bold" : ""}`}>
+                      <div key={label as string}
+                        className={`flex items-center justify-between border-b border-gray-100 pb-1.5 last:border-0 last:pb-0 ${bold ? "font-bold" : ""}`}>
                         <span className={bold ? "text-gray-900" : "text-gray-600"}>{label}</span>
                         <span className={bold ? "text-gray-900" : "text-gray-700"}>{val}</span>
                       </div>
@@ -332,10 +420,12 @@ export default function CalculatorPage() {
                 </div>
               )}
 
-              {/* Health Alerts */}
+              {/* Health Alerts — shows when goal AND ingredients are both set */}
               {rows.length > 0 && selectedGoal && (
                 <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-3">
-                  <p className="font-bold text-gray-900 text-sm">Health Alerts</p>
+                  <p className="font-bold text-gray-900 text-sm">
+                    Health Alerts — <span className="text-green-700">{selectedGoal.label}</span>
+                  </p>
                   {alerts.length === 0 ? (
                     <div className="flex items-center gap-2 bg-green-50 rounded-lg px-3 py-2 text-xs text-green-700">
                       <CheckCircle size={13} /> Meal looks well-balanced for your goal!
@@ -343,13 +433,25 @@ export default function CalculatorPage() {
                   ) : (
                     <div className="space-y-2">
                       {alerts.map((a, i) => (
-                        <div key={i} className={`flex items-start gap-2 rounded-lg px-3 py-2 text-xs ${a!.type === "warn" ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>
-                          {a!.type === "warn" ? <AlertTriangle size={12} className="shrink-0 mt-0.5" /> : <CheckCircle size={12} className="shrink-0 mt-0.5" />}
+                        <div key={i}
+                          className={`flex items-start gap-2 rounded-lg px-3 py-2 text-xs ${a!.type === "warn" ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"
+                            }`}>
+                          {a!.type === "warn"
+                            ? <AlertTriangle size={12} className="shrink-0 mt-0.5" />
+                            : <CheckCircle size={12} className="shrink-0 mt-0.5" />}
                           {a!.msg}
                         </div>
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* No goal selected but ingredients added — prompt to pick goal */}
+              {rows.length > 0 && !selectedGoal && (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+                  <p className="text-sm font-semibold text-amber-800 mb-1">👆 Select a health goal</p>
+                  <p className="text-xs text-amber-600">Choose one of the health goals above to see personalised alerts and food alternatives for your meal.</p>
                 </div>
               )}
 
@@ -380,17 +482,24 @@ export default function CalculatorPage() {
               {/* CTA Buttons */}
               {rows.length > 0 && (
                 <div className="space-y-2">
-                  <Link href="/cart" className="w-full bg-[#f97316] text-white py-3 rounded-full text-sm font-bold flex items-center justify-center hover:bg-orange-600 transition-colors">
+                  <Link href="/cart"
+                    className="w-full bg-[#f97316] text-white py-3 rounded-full text-sm font-bold flex items-center justify-center hover:bg-orange-600 transition-colors">
                     Add Ingredients to Cart
                   </Link>
-                  <Link href="/shop" className="w-full bg-[#14532d] text-white py-3 rounded-full text-sm font-bold flex items-center justify-center hover:bg-green-800 transition-colors">
+                  <Link href="/shop"
+                    className="w-full bg-[#14532d] text-white py-3 rounded-full text-sm font-bold flex items-center justify-center hover:bg-green-800 transition-colors">
                     Subscribe to Weekly Meal Pack
                   </Link>
                   <div className="grid grid-cols-2 gap-2">
-                    <button className="border border-gray-200 text-gray-700 py-2.5 rounded-full text-xs font-semibold hover:border-gray-400 transition-colors">Save Meal Plan</button>
-                    <button className="border border-gray-200 text-gray-700 py-2.5 rounded-full text-xs font-semibold hover:border-gray-400 transition-colors">Share on WhatsApp</button>
+                    <button className="border border-gray-200 text-gray-700 py-2.5 rounded-full text-xs font-semibold hover:border-gray-400 transition-colors">
+                      Save Meal Plan
+                    </button>
+                    <button className="border border-gray-200 text-gray-700 py-2.5 rounded-full text-xs font-semibold hover:border-gray-400 transition-colors">
+                      Share on WhatsApp
+                    </button>
                   </div>
-                  <Link href="/book-online" className="w-full border border-gray-200 text-gray-700 py-2.5 rounded-full text-sm font-semibold flex items-center justify-center hover:border-gray-400 transition-colors">
+                  <Link href="/book-online"
+                    className="w-full border border-gray-200 text-gray-700 py-2.5 rounded-full text-sm font-semibold flex items-center justify-center hover:border-gray-400 transition-colors">
                     Book Nutrition Consultation
                   </Link>
                 </div>

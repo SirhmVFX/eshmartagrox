@@ -5,8 +5,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getSiteSettings, SiteSettings } from "@/lib/firestore";
 
-const SOCIAL = ["Threads", "TikTok", "Instagram", "Facebook", "LinkedIn", "Pinterest", "YouTube"];
-
 const COLS = [
   {
     heading: "Shop",
@@ -31,7 +29,7 @@ const COLS = [
   {
     heading: "Company",
     links: [
-      { label: "About us", href: "/about" },
+      { label: "About Us", href: "/about" },
       { label: "Blog", href: "/blog" },
       { label: "Community", href: "/#community" },
       { label: "Loyalty Club", href: "/profile" },
@@ -41,8 +39,8 @@ const COLS = [
   {
     heading: "Support",
     links: [
-      { label: "WhatsApp support", href: "https://wa.me/2347047296000" },
-      { label: "Delivery zones", href: "/contact" },
+      { label: "WhatsApp Support", href: "https://wa.me/2347047296000" },
+      { label: "Delivery Zones", href: "/contact" },
       { label: "Returns", href: "/contact" },
       { label: "+234 704 729 6000", href: "tel:+2347047296000" },
       { label: "FAQ", href: "/#faq" },
@@ -60,6 +58,19 @@ export default function Footer() {
   const siteName = settings?.siteName ?? "ESHMARTAGROX";
   const tagline = settings?.tagline ?? "Nigeria's home for healthy eating, senior wellness, smart grocery delivery and organic commodity exports to Europe, USA & Asia.";
   const year = new Date().getFullYear();
+
+  // Build social links dynamically from settings — only show configured ones
+  const socials = [
+    { label: "Facebook", href: settings?.facebook },
+    { label: "Instagram", href: settings?.instagram },
+    { label: "TikTok", href: settings?.tiktok },
+    { label: "YouTube", href: settings?.youtube },
+    { label: "LinkedIn", href: settings?.linkedin },
+    { label: "Pinterest", href: settings?.pinterest },
+    { label: "Threads", href: settings?.threads },
+    { label: "Twitter/X", href: settings?.twitter },
+    { label: "WhatsApp", href: settings?.whatsapp ? `https://wa.me/${settings.whatsapp.replace(/\D/g, "")}` : undefined },
+  ].filter(s => s.href);
 
   return (
     <footer className="bg-[#FFFDF7] border-t border-gray-200 pt-14 pb-8">
@@ -79,13 +90,23 @@ export default function Footer() {
 
             <p className="text-xs text-gray-500 leading-relaxed max-w-[220px]">{tagline}</p>
 
-            {/* Social pills */}
+            {/* Social links — dynamic from admin */}
             <div className="flex flex-wrap gap-1.5">
-              {SOCIAL.map(s => (
-                <span key={s} className="border border-gray-200 rounded-full px-3 py-1 text-xs text-gray-600 hover:border-gray-400 cursor-pointer transition-colors">
-                  {s}
-                </span>
-              ))}
+              {socials.length > 0 ? (
+                socials.map(s => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+                    className="border border-gray-200 rounded-full px-3 py-1 text-xs text-gray-600 hover:border-gray-400 hover:text-gray-900 cursor-pointer transition-colors">
+                    {s.label}
+                  </a>
+                ))
+              ) : (
+                // Fallback placeholder pills while settings load
+                ["Facebook", "Instagram", "TikTok", "YouTube"].map(s => (
+                  <span key={s} className="border border-gray-200 rounded-full px-3 py-1 text-xs text-gray-400">
+                    {s}
+                  </span>
+                ))
+              )}
             </div>
 
             {/* Payment methods */}
