@@ -87,13 +87,13 @@ function Header() {
 
         {/* Logo */}
         <Link href="/" className="shrink-0">
-          <div className="w-20 h-20 md:w-24 md:h-24 relative">
+          <div className="w-20 h-20 md:w-36 md:h-36 relative">
             {isExport ? (
-              <Image src="/assets/eshmartlogowhite.png" alt="Eshmart Agrox" width={96} height={96} className="w-full h-full object-contain" />
+              <Image src="/assets/eshmartlogowhite.png" alt="Eshmart Agrox" width={2000} height={2000} className="w-full h-full object-contain" />
             ) : settings.logoUrl ? (
               <Image src={settings.logoUrl} alt={settings.siteName} fill className="object-contain" />
             ) : (
-              <Image src="/assets/eshmartlogo.png" alt="Eshmart Agrox" width={96} height={96} className="w-full h-full object-contain" />
+              <Image src="/assets/eshmartlogo.png" alt="Eshmart Agrox" width={2000} height={2000} className="w-full h-full object-contain" />
             )}
           </div>
         </Link>
