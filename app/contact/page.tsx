@@ -86,6 +86,9 @@ export default function ContactPage() {
                                     <option>Shipping & Logistics</option>
                                     <option>Quality & Compliance</option>
                                     <option>Partnership</option>
+                                    <option>Farm Tour</option>
+                                    <option>Order Planning</option>
+                                    <option>Produce Consultation</option>
                                     <option>Other</option>
                                 </select>
                             </div>

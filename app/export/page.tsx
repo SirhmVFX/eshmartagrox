@@ -216,7 +216,7 @@ export default function ExportPage() {
               </p>
             </div>
             <a
-              href="#quote"
+              href="/book-online"
               className="bg-[#0d1b12] text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-gray-800 transition-colors whitespace-nowrap flex items-center gap-2"
             >
               Talk to export desk <ArrowRight size={14} />

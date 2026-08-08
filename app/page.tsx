@@ -628,7 +628,7 @@ export default function HomePage() {
                 Bulk pricing, FOB Lagos / Apapa · CIF on request. MOQ from 1 × 20ft container.
               </p>
             </div>
-            <Link href="/export#quote" className="bg-[#0d1b12] text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-gray-800 transition-colors whitespace-nowrap flex items-center gap-2">
+            <Link href="/book-online" className="bg-[#0d1b12] text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-gray-800 transition-colors whitespace-nowrap flex items-center gap-2">
               Talk to export desk <ArrowRight size={14} />
             </Link>
           </div>
