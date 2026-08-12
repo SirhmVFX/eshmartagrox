@@ -11,6 +11,7 @@ import {
   SubscriptionPackage, BoxItem, ConsultationTier, HomepageStat, ExportCommodity,
   Testimonial, FAQ, FoodLibraryCategory, ExportDestination, HomepageHeroContent, Nutritionist,
 } from "@/lib/firestore";
+import ExportCatalog from "@/components/ExportCatalog";
 
 // ── Fallback data (used until Firestore is populated) ──────────────────────
 
@@ -52,34 +53,19 @@ const DEFAULT_STATS: HomepageStat[] = [
   { value: "50+", label: "Nutritionist recipes", active: true, order: 3 },
 ];
 
-const DEFAULT_COMMODITIES_RAW: ExportCommodity[] = [
-  { name: "Raw cashew nuts (RCN)", spec: "OL 180–210", priceMin: 1250, priceMax: 1450, moq: "20 MT (1×20ft)", catalogType: "raw", active: true, order: 1 },
-  { name: "Sesame seeds (white)", spec: "99% purity, FFA <2%", priceMin: 1550, priceMax: 1750, moq: "25 MT", catalogType: "raw", active: true, order: 2 },
-  { name: "Cocoa beans", spec: "Grade 1, fermented", priceMin: 3200, priceMax: 3600, moq: "20 MT", catalogType: "raw", active: true, order: 3 },
-  { name: "Hibiscus flower (Zobo)", spec: "Sun-dried, sortex-cleaned", priceMin: 1800, priceMax: 2100, moq: "10 MT", catalogType: "raw", active: true, order: 4 },
-  { name: "Fresh / split ginger", spec: "Sun-dried, 8% moisture", priceMin: 2400, priceMax: 2800, moq: "20 MT", catalogType: "raw", active: true, order: 5 },
-  { name: "Shea nuts", spec: "Hand-picked, 7% moisture", priceMin: 650, priceMax: 850, moq: "25 MT", catalogType: "raw", active: true, order: 6 },
-  { name: "Soybeans", spec: "Non-GMO, 98% purity", priceMin: 520, priceMax: 640, moq: "25 MT", catalogType: "raw", active: true, order: 7 },
-  { name: "Bitter kola (Garcinia)", spec: "Whole, sun-dried", priceMin: 3500, priceMax: 4200, moq: "5 MT", catalogType: "raw", active: true, order: 8 },
-  { name: "Hardwood charcoal", spec: "Ash <4%, fixed C >75%", priceMin: 420, priceMax: 560, moq: "25 MT", catalogType: "raw", active: true, order: 9 },
-  { name: "Palm kernel", spec: "Cracked, 8% moisture", priceMin: 480, priceMax: 620, moq: "25 MT", catalogType: "raw", active: true, order: 10 },
-  { name: "Gum arabic", spec: "Grade 1, hand-picked", priceMin: 2800, priceMax: 3400, moq: "10 MT", catalogType: "raw", active: true, order: 11 },
-  { name: "Tiger nuts", spec: "Cleaned, sortex", priceMin: 1900, priceMax: 2300, moq: "10 MT", catalogType: "raw", active: true, order: 12 },
-];
-
-const DEFAULT_COMMODITIES_PROCESSED: ExportCommodity[] = [
-  { name: "Cashew kernels (W320)", spec: "Vacuum-packed, 22.68 kg tins", priceMin: 6800, priceMax: 7400, moq: "5 MT", catalogType: "processed", active: true, order: 1 },
-  { name: "Unrefined shea butter", spec: "Grade A, food/cosmetic", priceMin: 2400, priceMax: 2900, moq: "5 MT", catalogType: "processed", active: true, order: 2 },
-  { name: "Natural cocoa powder", spec: "10–12% fat, alkalised option", priceMin: 3900, priceMax: 4500, moq: "5 MT", catalogType: "processed", active: true, order: 3 },
-  { name: "Dried hibiscus tea-cut", spec: "Cut & sifted, EU-grade", priceMin: 2400, priceMax: 2800, moq: "5 MT", catalogType: "processed", active: true, order: 4 },
-  { name: "Ground ginger powder", spec: "Sortex, mesh 60", priceMin: 3100, priceMax: 3600, moq: "5 MT", catalogType: "processed", active: true, order: 5 },
-  { name: "Cold-pressed palm oil", spec: "Red, FFA <5%, drums", priceMin: 1150, priceMax: 1350, moq: "20 MT", catalogType: "processed", active: true, order: 6 },
-  { name: "Garri (export grade)", spec: "White & yellow, 5kg packs", priceMin: 1400, priceMax: 1650, moq: "10 MT", catalogType: "processed", active: true, order: 7 },
-  { name: "Plantain flour", spec: "Stone-ground, 25kg bags", priceMin: 1800, priceMax: 2100, moq: "5 MT", catalogType: "processed", active: true, order: 8 },
-  { name: "Yam flour (Elubo)", spec: "Pure, 25kg bags", priceMin: 1950, priceMax: 2250, moq: "5 MT", catalogType: "processed", active: true, order: 9 },
-  { name: "Tiger-nut flour", spec: "Gluten-free, 10kg packs", priceMin: 3200, priceMax: 3800, moq: "3 MT", catalogType: "processed", active: true, order: 10 },
-  { name: "Cocoa butter (natural)", spec: "Deodorised, food grade", priceMin: 7500, priceMax: 8400, moq: "5 MT", catalogType: "processed", active: true, order: 11 },
-  { name: "Sesame oil (cold-pressed)", spec: "Virgin, 200L drums", priceMin: 3400, priceMax: 3900, moq: "5 MT", catalogType: "processed", active: true, order: 12 },
+const DEFAULT_COMMODITIES: ExportCommodity[] = [
+  { name: "Raw cashew nuts (RCN)", spec: "OL 180–210", priceMin: 1250, priceMax: 1450, moq: "20 MT (1×20ft)", catalogType: "raw", category: "Nuts", certification: "Organic", markets: ["Europe", "USA", "Asia"], packaging: ["1 MT", "Bulk", "Container"], active: true, order: 1 },
+  { name: "Sesame seeds (white)", spec: "99% purity, FFA <2%", priceMin: 1550, priceMax: 1750, moq: "25 MT", catalogType: "raw", category: "Seeds", certification: "Organic", markets: ["Europe", "Asia", "Middle East"], packaging: ["25 kg", "50 kg", "Bulk"], active: true, order: 2 },
+  { name: "Cocoa beans", spec: "Grade 1, fermented", priceMin: 3200, priceMax: 3600, moq: "20 MT", catalogType: "raw", category: "Cocoa", certification: "Organic", markets: ["Europe", "USA", "Asia"], packaging: ["50 kg", "1 MT", "Container"], active: true, order: 3 },
+  { name: "Hibiscus flower (Zobo)", spec: "Sun-dried, sortex-cleaned", priceMin: 1800, priceMax: 2100, moq: "10 MT", catalogType: "raw", category: "Botanicals", certification: "Organic", markets: ["Europe", "USA", "Middle East"], packaging: ["25 kg", "50 kg"], active: true, order: 4 },
+  { name: "Fresh / split ginger", spec: "Sun-dried, 8% moisture", priceMin: 2400, priceMax: 2800, moq: "20 MT", catalogType: "raw", category: "Roots", certification: "Organic", markets: ["Europe", "Asia", "Africa"], packaging: ["25 kg", "50 kg", "Bulk"], active: true, order: 5 },
+  { name: "Shea nuts", spec: "Hand-picked, 7% moisture", priceMin: 650, priceMax: 850, moq: "25 MT", catalogType: "raw", category: "Nuts", certification: "Conventional", markets: ["Europe", "USA", "Africa"], packaging: ["50 kg", "Bulk", "Container"], active: true, order: 6 },
+  { name: "Soybeans", spec: "Non-GMO, 98% purity", priceMin: 520, priceMax: 640, moq: "25 MT", catalogType: "raw", category: "Grains", certification: "Non-GMO", markets: ["Asia", "Africa", "Middle East"], packaging: ["50 kg", "1 MT", "Bulk"], active: true, order: 7 },
+  { name: "Cashew kernels (W320)", spec: "Vacuum-packed, 22.68 kg tins", priceMin: 6800, priceMax: 7400, moq: "5 MT", catalogType: "processed", category: "Nuts", certification: "Organic", markets: ["Europe", "USA", "Asia"], packaging: ["25 kg", "1 MT"], active: true, order: 1 },
+  { name: "Unrefined shea butter", spec: "Grade A, food/cosmetic", priceMin: 2400, priceMax: 2900, moq: "5 MT", catalogType: "processed", category: "Oils", certification: "Organic", markets: ["Europe", "USA", "Middle East"], packaging: ["25 kg", "50 kg"], active: true, order: 2 },
+  { name: "Natural cocoa powder", spec: "10–12% fat, alkalised option", priceMin: 3900, priceMax: 4500, moq: "5 MT", catalogType: "processed", category: "Cocoa", certification: "Organic", markets: ["Europe", "USA", "Asia"], packaging: ["25 kg", "50 kg"], active: true, order: 3 },
+  { name: "Ground ginger powder", spec: "Sortex, mesh 60", priceMin: 3100, priceMax: 3600, moq: "5 MT", catalogType: "processed", category: "Spices", certification: "Organic", markets: ["Europe", "Asia", "Middle East"], packaging: ["25 kg", "50 kg"], active: true, order: 4 },
+  { name: "Garri (export grade)", spec: "White & yellow, 5kg packs", priceMin: 1400, priceMax: 1650, moq: "10 MT", catalogType: "processed", category: "Roots", certification: "Conventional", markets: ["Africa", "Europe", "USA"], packaging: ["25 kg", "50 kg"], active: true, order: 5 },
 ];
 
 const DEFAULT_TESTIMONIALS: Testimonial[] = [
@@ -197,9 +183,7 @@ export default function HomePage() {
   const [stats, setStats] = useState<HomepageStat[]>(DEFAULT_STATS);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS);
   const [faqs, setFaqs] = useState<FAQ[]>(DEFAULT_FAQS);
-  const [catalogTab, setCatalogTab] = useState<"raw" | "processed">("raw");
-  const [rawCommodities, setRawCommodities] = useState<ExportCommodity[]>(DEFAULT_COMMODITIES_RAW);
-  const [processedCommodities, setProcessedCommodities] = useState<ExportCommodity[]>(DEFAULT_COMMODITIES_PROCESSED);
+  const [commodities, setCommodities] = useState<ExportCommodity[]>(DEFAULT_COMMODITIES);
   const [foodLibrary, setFoodLibrary] = useState<FoodLibraryCategory[]>([]);
   const [exportDests, setExportDests] = useState<ExportDestination[]>(DEFAULT_EXPORT_DESTINATIONS);
   const [hero, setHero] = useState<HomepageHeroContent>(DEFAULT_HERO);
@@ -213,17 +197,13 @@ export default function HomePage() {
     getTestimonials().then(d => { if (d.length) setTestimonials(d); }).catch(() => { });
     getFAQs().then(d => { if (d.length) setFaqs(d); }).catch(() => { });
     getExportCommodities().then(all => {
-      const raw = all.filter(c => c.catalogType === "raw");
-      const processed = all.filter(c => c.catalogType === "processed");
-      if (raw.length) setRawCommodities(raw);
-      if (processed.length) setProcessedCommodities(processed);
+      if (all.length) setCommodities(all);
     }).catch(() => { });
     getFoodLibraryCategories().then(d => { if (d.length) setFoodLibrary(d); }).catch(() => { });
     getExportDestinations().then(d => { if (d.length) setExportDests(d); }).catch(() => { });
     getHomepageHeroContent().then(h => { if (h) setHero(h); }).catch(() => { });
   }, []);
 
-  const activeCommodities = catalogTab === "raw" ? rawCommodities : processedCommodities;
   const displayFoodLibrary = foodLibrary.length ? foodLibrary : DEFAULT_FOOD_LIBRARY;
 
   return (
@@ -563,61 +543,12 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Full catalog with Raw / Processed tab — same as /export page */}
-          <div className="bg-[#1a2e1f] rounded-2xl overflow-hidden mb-4">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 gap-4 flex-wrap">
-              <p className="font-bold text-[#4ade80] text-sm">Full export catalog</p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setCatalogTab("raw")}
-                  className={`text-xs font-bold px-4 py-1.5 rounded-full transition-colors ${catalogTab === "raw" ? "bg-[#4ade80] text-[#0d1b12]" : "bg-white/10 text-white hover:bg-white/20"}`}
-                >
-                  Raw ({rawCommodities.length})
-                </button>
-                <button
-                  onClick={() => setCatalogTab("processed")}
-                  className={`text-xs font-bold px-4 py-1.5 rounded-full transition-colors ${catalogTab === "processed" ? "bg-[#4ade80] text-[#0d1b12]" : "bg-white/10 text-white hover:bg-white/20"}`}
-                >
-                  Processed ({processedCommodities.length})
-                </button>
-              </div>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left px-3 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-10"></th>
-                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Commodity</th>
-                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden sm:table-cell">Grade / Spec</th>
-                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Indicative Price (FOB)</th>
-                    <th className="text-left px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider hidden md:table-cell">MOQ</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {activeCommodities.map(c => (
-                    <tr key={c.name} className="hover:bg-white/5 transition-colors">
-                      <td className="px-3 py-2.5">
-                        <div className="relative w-9 h-9 rounded-lg overflow-hidden shrink-0">
-                          <Image src={c.image || "/assets/6.jpg"} alt={c.name} fill className="object-cover" />
-                        </div>
-                      </td>
-                      <td className="px-5 py-3 font-semibold text-white">{c.name}</td>
-                      <td className="px-5 py-3 text-gray-400 hidden sm:table-cell">{c.spec}</td>
-                      <td className="px-5 py-3 font-semibold text-[#4ade80]">
-                        ${c.priceMin.toLocaleString()} – ${c.priceMax.toLocaleString()} / MT
-                      </td>
-                      <td className="px-5 py-3 text-gray-400 hidden md:table-cell">{c.moq}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="px-5 py-2.5 border-t border-white/10">
-              <p className="text-xs text-gray-500">
-                Prices are indicative FOB Lagos / Apapa in USD and subject to market conditions,
-                lot size and destination. CIF, CFR and DDP terms available on request.
-              </p>
-            </div>
+          <div className="mb-4">
+            <ExportCatalog
+              commodities={commodities}
+              compact
+              footnote="Prices are indicative FOB Lagos / Apapa in USD and subject to market conditions, lot size and destination. CIF, CFR and DDP terms available on request."
+            />
           </div>
 
           {/* Quote CTA bar */}

@@ -571,6 +571,18 @@ export async function markAllNotificationsRead(userId: string): Promise<void> {
 
 // ── Export Commodities (client readers) ───────────────────────────────────
 
+export const EXPORT_CATEGORIES = [
+    "Cocoa", "Nuts", "Seeds", "Spices", "Roots", "Fruits", "Botanicals", "Grains", "Oils",
+] as const;
+export const EXPORT_CERTIFICATIONS = ["Organic", "Non-GMO", "Conventional"] as const;
+export const EXPORT_MARKETS = ["Europe", "USA", "Asia", "Middle East", "Africa"] as const;
+export const EXPORT_PACKAGING = ["25 kg", "50 kg", "1 MT", "Bulk", "Container"] as const;
+
+export type ExportCategory = (typeof EXPORT_CATEGORIES)[number];
+export type ExportCertification = (typeof EXPORT_CERTIFICATIONS)[number];
+export type ExportMarket = (typeof EXPORT_MARKETS)[number];
+export type ExportPackaging = (typeof EXPORT_PACKAGING)[number];
+
 export interface ExportCommodity {
     id?: string;
     name: string;
@@ -579,6 +591,10 @@ export interface ExportCommodity {
     priceMax: number;       // USD per MT
     moq: string;            // e.g. "25 MT"
     catalogType: "raw" | "processed"; // which tab to show under
+    category?: ExportCategory;
+    certification?: ExportCertification;
+    markets?: ExportMarket[];
+    packaging?: ExportPackaging[];
     image?: string;         // optional thumbnail
     active: boolean;
     order: number;
