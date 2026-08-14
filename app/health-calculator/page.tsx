@@ -120,7 +120,9 @@ export default function HealthCalculator() {
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
-                        step="0.1"
+                        step={m.key === "age" ? "1" : "0.1"}
+                        min={m.key === "age" ? "1" : undefined}
+                        max={m.key === "age" ? "120" : undefined}
                         value={values[m.key] ?? ""}
                         onChange={e => setValues(v => ({ ...v, [m.key]: e.target.value }))}
                         placeholder={m.placeholder}

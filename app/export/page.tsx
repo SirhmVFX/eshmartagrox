@@ -23,6 +23,7 @@ const DEFAULT_HERO: ExportHeroContent = {
   quoteCta1Label: "Send Quote Request",
   quoteCta2Label: "Talk to export desk",
   hidePrices: false,
+  showDetailPrices: true,
 };
 
 const DEFAULT_DESTINATIONS: ExportDestination[] = [

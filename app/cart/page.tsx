@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/lib/auth";
 import Link from "next/link";
-import { validateCoupon, CouponValidationResult } from "@/lib/firestore";
+import { getSubscriptionPackages, validateCoupon, CouponValidationResult, SubscriptionPackage } from "@/lib/firestore";
 import { useCurrency } from "@/lib/currency";
 import { Tag, X } from "lucide-react";
+
+const FALLBACK_PACKAGE_ITEMS: Record<string, string[]> = {
+  "Senior Wellness": ["Fresh ugu, spinach & garden eggs", "Ofada / brown rice", "Beans & soybeans", "Fish & lean protein", "Seasonal fruits"],
+  "Family of Four": ["Rice, yam & plantain", "Beans & legumes", "Fish & chicken", "Vegetables & fruits weekly", "Free delivery & swap"],
+  "Student Smart Pack": ["Rice, noodles & spaghetti", "Eggs & beans", "Tomatoes & vegetables", "Quick-prep proteins"],
+  "Working Professional": ["Lean proteins", "Smart carbs", "Salad & greens", "Healthy snacks"],
+};
 
 export default function CartPage() {
   const { items, remove, clear, total } = useCart();
@@ -21,6 +28,17 @@ export default function CartPage() {
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponResult, setCouponResult] = useState<CouponValidationResult | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
+  const [packages, setPackages] = useState<SubscriptionPackage[]>([]);
+
+  useEffect(() => {
+    getSubscriptionPackages().then(setPackages).catch(() => {});
+  }, []);
+
+  function itemContents(it: { id: string; name: string; contents?: string[] }) {
+    if (it.contents?.length) return it.contents.filter(Boolean);
+    const pkg = packages.find(p => p.id === it.id || p.name === it.name);
+    return (pkg?.items ?? FALLBACK_PACKAGE_ITEMS[it.name] ?? []).filter(Boolean);
+  }
 
   const discountAmount = couponResult?.valid ? (couponResult.discountAmount ?? 0) : 0;
   const finalTotal = couponResult?.valid ? (couponResult.finalTotal ?? total) : total;
@@ -97,18 +115,34 @@ export default function CartPage() {
 
       {/* Cart items */}
       <ul className="space-y-4">
-        {items.map((it) => (
-          <li key={it.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 py-2 border-b border-gray-100">
-            <div>
+        {items.map((it) => {
+          const contents = itemContents(it);
+          return (
+          <li key={it.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 py-3 border-b border-gray-100">
+            <div className="min-w-0">
               <div className="font-medium">{it.name}</div>
-              <div className="text-sm text-gray-500">Quantity: {it.quantity}</div>
+              <div className="text-sm text-gray-500">
+                Quantity: {it.quantity}
+                {it.period ? <span className="text-gray-400"> · {it.period.replace(/^\s*\//, "").trim()}</span> : null}
+              </div>
+              {contents.length > 0 && (
+                <ul className="mt-2 space-y-0.5">
+                  {contents.map((line) => (
+                    <li key={line} className="text-xs text-gray-500 flex items-start gap-1.5">
+                      <span className="text-green-700 mt-px">✓</span>
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 shrink-0">
               <div className="font-medium">{format(it.price * it.quantity)}</div>
               <button className="text-red-600 text-sm" onClick={() => remove(it.id)}>Remove</button>
             </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
 
       {/* Order summary */}

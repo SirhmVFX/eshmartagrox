@@ -14,7 +14,7 @@ export default function ExportCommodityPage() {
   const [item, setItem] = useState<ExportCommodity | null>(null);
   const [related, setRelated] = useState<ExportCommodity[]>([]);
   const [others, setOthers] = useState<ExportCommodity[]>([]);
-  const [hidePrices, setHidePrices] = useState(false);
+  const [showPrices, setShowPrices] = useState(true);
   const [loading, setLoading] = useState(true);
   const [activeImg, setActiveImg] = useState(0);
 
@@ -29,7 +29,7 @@ export default function ExportCommodityPage() {
     ])
       .then(([data, all, hero]) => {
         setItem(data);
-        setHidePrices(!!hero?.hidePrices);
+        setShowPrices(hero?.showDetailPrices !== false);
         if (!data) return;
         const relatedSet = new Set(data.relatedIds ?? []);
         const rest = all.filter(c => c.id && c.id !== data.id);
@@ -105,7 +105,7 @@ export default function ExportCommodityPage() {
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mt-1">{item.name}</h1>
           </div>
 
-          {!hidePrices && (
+          {showPrices && (
             <div className="flex items-baseline gap-2">
               <span className="text-2xl md:text-3xl font-bold text-green-600">
                 ${item.priceMin.toLocaleString()} – ${item.priceMax.toLocaleString()}
@@ -193,7 +193,7 @@ export default function ExportCommodityPage() {
                 </div>
                 <div className="p-3 space-y-1">
                   <p className="text-sm font-semibold text-gray-800 line-clamp-2 hover:text-green-900">{c.name}</p>
-                  {!hidePrices && (
+                  {showPrices && (
                     <p className="text-green-700 font-bold text-sm">
                       ${c.priceMin.toLocaleString()} – ${c.priceMax.toLocaleString()}
                     </p>
@@ -225,7 +225,7 @@ export default function ExportCommodityPage() {
                 </div>
                 <div className="p-3 space-y-1">
                   <p className="text-sm font-semibold text-gray-800 line-clamp-2 hover:text-green-900">{c.name}</p>
-                  {!hidePrices && (
+                  {showPrices && (
                     <p className="text-green-700 font-bold text-sm">
                       ${c.priceMin.toLocaleString()} – ${c.priceMax.toLocaleString()}
                     </p>

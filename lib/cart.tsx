@@ -2,7 +2,15 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type CartItem = { id: string; name: string; price: number; quantity: number };
+type CartItem = {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  contents?: string[];
+  period?: string;
+  kind?: "package" | "product" | "box";
+};
 
 type CartContextValue = {
   items: CartItem[];
@@ -38,8 +46,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const add = (item: CartItem) => {
     setItems((prev) => {
-      const found = prev.find((p) => p.id === item.id);
-      if (found) return prev.map((p) => (p.id === item.id ? { ...p, quantity: p.quantity + item.quantity } : p));
+      const found = prev.find((p) =>
+        p.id === item.id || (item.kind === "package" && p.kind === "package" && p.name === item.name)
+      );
+      if (found) {
+        return prev.map((p) =>
+          p.id === found.id
+            ? {
+                ...p,
+                quantity: p.quantity + item.quantity,
+                contents: item.contents?.length ? item.contents : p.contents,
+                period: item.period ?? p.period,
+                kind: item.kind ?? p.kind,
+              }
+            : p
+        );
+      }
       return [...prev, item];
     });
   };

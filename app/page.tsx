@@ -344,7 +344,15 @@ export default function HomePage() {
                       </ul>
                       <button
                         onClick={() => {
-                          add({ id: pkg.id ?? `pkg-${pkg.name}`, name: pkg.name, price: pkg.price, quantity: 1 });
+                          add({
+                            id: pkg.id ?? `pkg-${pkg.name}`,
+                            name: pkg.name,
+                            price: pkg.price,
+                            quantity: 1,
+                            kind: "package",
+                            period: pkg.period,
+                            contents: (pkg.items ?? []).filter(Boolean),
+                          });
                           router.push("/cart");
                         }}
                         className="w-full bg-[#0d1b12] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors mt-1"

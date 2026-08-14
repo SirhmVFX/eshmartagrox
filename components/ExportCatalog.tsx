@@ -106,13 +106,15 @@ export default function ExportCatalog({ commodities, footnote, compact, hidePric
         <div className="flex items-center justify-between gap-3 mb-4">
           <p className={`font-bold text-[#4ade80] ${compact ? "text-sm" : "text-base"}`}>Full export catalog</p>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setHidePrices(h => !h)}
-              className="text-[11px] font-semibold text-gray-300 hover:text-white border border-white/15 px-3 py-1 rounded-full"
-            >
-              {hidePrices ? "Show prices" : "Hide prices"}
-            </button>
+            {!hidePricesDefault && (
+              <button
+                type="button"
+                onClick={() => setHidePrices(h => !h)}
+                className="text-[11px] font-semibold text-gray-300 hover:text-white border border-white/15 px-3 py-1 rounded-full"
+              >
+                {hidePrices ? "Show prices" : "Hide prices"}
+              </button>
+            )}
             {hasActiveFilters && (
               <button
                 type="button"
