@@ -3,15 +3,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Check, ArrowRight, ChevronRight, ChevronDown, ChevronUp, Globe } from "lucide-react";
 import {
   getSubscriptionPackages, getBoxItems, getConsultationTiers, getHomepageStats,
   getExportCommodities, getTestimonials, getFAQs, getFoodLibraryCategories,
-  getExportDestinations, getHomepageHeroContent, getNutritionists,
+  getExportDestinations, getHomepageHeroContent, getNutritionists, getExportHeroContent,
   SubscriptionPackage, BoxItem, ConsultationTier, HomepageStat, ExportCommodity,
   Testimonial, FAQ, FoodLibraryCategory, ExportDestination, HomepageHeroContent, Nutritionist,
 } from "@/lib/firestore";
 import ExportCatalog from "@/components/ExportCatalog";
+import { useCart } from "@/lib/cart";
 
 // ── Fallback data (used until Firestore is populated) ──────────────────────
 
@@ -117,9 +119,19 @@ const DEFAULT_EXPORT_DESTINATIONS: ExportDestination[] = [
 // ── Build-Your-Own Box ─────────────────────────────────────────────────────
 
 function BuildBox({ items }: { items: BoxItem[] }) {
+  const { add } = useCart();
+  const router = useRouter();
   const [qty, setQty] = useState<Record<number, number>>({});
   const total = items.reduce((s, it, i) => s + (qty[i] ?? 0) * it.price, 0);
   const count = Object.values(qty).reduce((s, q) => s + q, 0);
+
+  const handleOrder = () => {
+    items.forEach((item, i) => {
+      const q = qty[i] ?? 0;
+      if (q > 0) add({ id: item.id ?? `box-${i}`, name: item.name, price: item.price, quantity: q });
+    });
+    router.push("/cart");
+  };
   return (
     <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
       <div className="px-4 py-2.5 bg-[#F5F0E8] flex items-center justify-between">
@@ -149,7 +161,7 @@ function BuildBox({ items }: { items: BoxItem[] }) {
           <p className="text-xs text-gray-500 uppercase tracking-wider">{count} items in box</p>
           <p className="text-xl font-bold text-gray-900">₦{total.toLocaleString()}</p>
         </div>
-        <button className="bg-gray-800 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-gray-900 transition-colors disabled:opacity-40" disabled={!count}>
+        <button className="bg-gray-800 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-gray-900 transition-colors disabled:opacity-40" disabled={!count} onClick={handleOrder}>
           Order custom box
         </button>
       </div>
@@ -187,6 +199,9 @@ export default function HomePage() {
   const [foodLibrary, setFoodLibrary] = useState<FoodLibraryCategory[]>([]);
   const [exportDests, setExportDests] = useState<ExportDestination[]>(DEFAULT_EXPORT_DESTINATIONS);
   const [hero, setHero] = useState<HomepageHeroContent>(DEFAULT_HERO);
+  const [hideExportPrices, setHideExportPrices] = useState(false);
+  const { add } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     getSubscriptionPackages().then(d => { if (d.length) setPackages(d); }).catch(() => { });
@@ -202,6 +217,7 @@ export default function HomePage() {
     getFoodLibraryCategories().then(d => { if (d.length) setFoodLibrary(d); }).catch(() => { });
     getExportDestinations().then(d => { if (d.length) setExportDests(d); }).catch(() => { });
     getHomepageHeroContent().then(h => { if (h) setHero(h); }).catch(() => { });
+    getExportHeroContent().then(h => { if (h) setHideExportPrices(!!h.hidePrices); }).catch(() => { });
   }, []);
 
   const displayFoodLibrary = foodLibrary.length ? foodLibrary : DEFAULT_FOOD_LIBRARY;
@@ -326,7 +342,13 @@ export default function HomePage() {
                           </li>
                         ))}
                       </ul>
-                      <button className="w-full bg-[#0d1b12] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors mt-1">
+                      <button
+                        onClick={() => {
+                          add({ id: pkg.id ?? `pkg-${pkg.name}`, name: pkg.name, price: pkg.price, quantity: 1 });
+                          router.push("/cart");
+                        }}
+                        className="w-full bg-[#0d1b12] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors mt-1"
+                      >
                         Subscribe
                       </button>
                     </div>
@@ -547,6 +569,7 @@ export default function HomePage() {
             <ExportCatalog
               commodities={commodities}
               compact
+              hidePricesDefault={hideExportPrices}
               footnote="Prices are indicative FOB Lagos / Apapa in USD and subject to market conditions, lot size and destination. CIF, CFR and DDP terms available on request."
             />
           </div>

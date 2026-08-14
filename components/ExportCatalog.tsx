@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   ExportCommodity,
   ExportCategory,
@@ -20,6 +21,7 @@ interface ExportCatalogProps {
   commodities: ExportCommodity[];
   footnote?: string;
   compact?: boolean;
+  hidePricesDefault?: boolean;
 }
 
 function FilterSelect<T extends string>({
@@ -60,12 +62,17 @@ function FilterSelect<T extends string>({
   );
 }
 
-export default function ExportCatalog({ commodities, footnote, compact }: ExportCatalogProps) {
+export default function ExportCatalog({ commodities, footnote, compact, hidePricesDefault }: ExportCatalogProps) {
   const [productType, setProductType] = useState<ProductTypeFilter>("all");
   const [category, setCategory] = useState<ExportCategory | "all">("all");
   const [certification, setCertification] = useState<ExportCertification | "all">("all");
   const [market, setMarket] = useState<ExportMarket | "all">("all");
   const [packaging, setPackaging] = useState<ExportPackaging | "all">("all");
+  const [hidePrices, setHidePrices] = useState(!!hidePricesDefault);
+
+  useEffect(() => {
+    setHidePrices(!!hidePricesDefault);
+  }, [hidePricesDefault]);
 
   const filtered = useMemo(() => {
     return commodities.filter((c) => {
@@ -98,15 +105,24 @@ export default function ExportCatalog({ commodities, footnote, compact }: Export
       <div className={`${compact ? "px-5 py-3" : "px-6 py-4"} border-b border-white/10`}>
         <div className="flex items-center justify-between gap-3 mb-4">
           <p className={`font-bold text-[#4ade80] ${compact ? "text-sm" : "text-base"}`}>Full export catalog</p>
-          {hasActiveFilters && (
+          <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={clearFilters}
-              className="text-[11px] font-semibold text-[#4ade80] hover:underline"
+              onClick={() => setHidePrices(h => !h)}
+              className="text-[11px] font-semibold text-gray-300 hover:text-white border border-white/15 px-3 py-1 rounded-full"
             >
-              Clear filters
+              {hidePrices ? "Show prices" : "Hide prices"}
             </button>
-          )}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-[11px] font-semibold text-[#4ade80] hover:underline"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
           <FilterSelect
@@ -131,28 +147,47 @@ export default function ExportCatalog({ commodities, footnote, compact }: Export
               <th className={`text-left ${compact ? "px-5" : "px-5"} py-3 text-xs font-semibold uppercase tracking-wider text-gray-400`}>Commodity</th>
               <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400 hidden sm:table-cell">Grade / Spec</th>
               <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400 hidden lg:table-cell">Details</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Indicative Price (FOB)</th>
+              {!hidePrices && (
+                <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Indicative Price (FOB)</th>
+              )}
               <th className="text-left px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400 hidden md:table-cell">MOQ</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-5 py-10 text-center text-gray-500 text-sm">
+                <td colSpan={hidePrices ? 5 : 6} className="px-5 py-10 text-center text-gray-500 text-sm">
                   No commodities match these filters.
                 </td>
               </tr>
             ) : (
-              filtered.map((c) => (
+              filtered.map((c) => {
+                const href = c.id ? `/export/${c.id}` : undefined;
+                return (
                 <tr key={c.id ?? c.name} className="hover:bg-white/5 transition-colors">
                   <td className={`${compact ? "px-3" : "px-3"} py-2.5`}>
-                    <div className="relative w-9 h-9 rounded-lg overflow-hidden shrink-0">
-                      <Image src={c.image || "/assets/6.jpg"} alt={c.name} fill className="object-cover" />
-                    </div>
+                    {href ? (
+                      <Link href={href} className="relative w-9 h-9 rounded-lg overflow-hidden shrink-0 block">
+                        <Image src={c.image || "/assets/6.jpg"} alt={c.name} fill className="object-cover" />
+                      </Link>
+                    ) : (
+                      <div className="relative w-9 h-9 rounded-lg overflow-hidden shrink-0">
+                        <Image src={c.image || "/assets/6.jpg"} alt={c.name} fill className="object-cover" />
+                      </div>
+                    )}
                   </td>
                   <td className="px-5 py-3">
-                    <p className="font-semibold text-white">{c.name}</p>
-                    <p className="text-[11px] text-gray-500 mt-0.5 capitalize">{c.catalogType}</p>
+                    {href ? (
+                      <Link href={href} className="block hover:text-[#4ade80]">
+                        <p className="font-semibold text-white">{c.name}</p>
+                        <p className="text-[11px] text-gray-500 mt-0.5 capitalize">{c.catalogType}</p>
+                      </Link>
+                    ) : (
+                      <>
+                        <p className="font-semibold text-white">{c.name}</p>
+                        <p className="text-[11px] text-gray-500 mt-0.5 capitalize">{c.catalogType}</p>
+                      </>
+                    )}
                   </td>
                   <td className="px-5 py-3 text-gray-400 hidden sm:table-cell">{c.spec}</td>
                   <td className="px-5 py-3 hidden lg:table-cell">
@@ -171,12 +206,15 @@ export default function ExportCatalog({ commodities, footnote, compact }: Export
                       ))}
                     </div>
                   </td>
-                  <td className="px-5 py-3 font-semibold text-[#4ade80]">
-                    ${c.priceMin.toLocaleString()} – ${c.priceMax.toLocaleString()} / MT
-                  </td>
+                  {!hidePrices && (
+                    <td className="px-5 py-3 font-semibold text-[#4ade80]">
+                      ${c.priceMin.toLocaleString()} – ${c.priceMax.toLocaleString()} / MT
+                    </td>
+                  )}
                   <td className="px-5 py-3 text-gray-400 hidden md:table-cell">{c.moq}</td>
                 </tr>
-              ))
+                );
+              })
             )}
           </tbody>
         </table>

@@ -8,15 +8,22 @@ import { useEffect, useState, useRef } from "react";
 import { useCart } from "@/lib/cart";
 import { useCurrency } from "@/lib/currency";
 import Image from "next/image";
-import { getSiteSettings, SiteSettings } from "@/lib/firestore";
+import { getSiteSettings, SiteSettings, getNavLinks, NavLink } from "@/lib/firestore";
 
 const LOCAL_NAV = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
   { label: "Calculator", href: "/calculator" },
+  { label: "Health Calculator", href: "/health-calculator" },
   { label: "Blog", href: "/blog" },
   { label: "Book Online", href: "/book-online" },
   { label: "Track Order", href: "/track-my-order" },
+];
+
+const COMPANY_NAV = [
+  { label: "About Us", href: "/about" },
+  { label: "Team members", href: "/team" },
+  { label: "FAQ", href: "/faq" },
 ];
 
 const EXPORT_NAV = [
@@ -50,8 +57,12 @@ function Header() {
   const [q, setQ] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [settings, setSettings] = useState<SiteSettings>(FALLBACK_SETTINGS);
+  const [cmsNav, setCmsNav] = useState<NavLink[]>([]);
   const [currencyOpen, setCurrencyOpen] = useState(false);
+  const [companyOpen, setCompanyOpen] = useState(false);
+  const [companyMobileOpen, setCompanyMobileOpen] = useState(false);
   const currencyRef = useRef<HTMLDivElement>(null);
+  const companyRef = useRef<HTMLDivElement>(null);
 
   const { user, logout } = useAuth();
   const cart = useCart();
@@ -62,12 +73,15 @@ function Header() {
 
   useEffect(() => {
     getSiteSettings().then(s => { if (s) setSettings(s); }).catch(() => { });
+    getNavLinks().then(links => { if (links.length) setCmsNav(links); }).catch(() => { });
   }, []);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (currencyRef.current && !currencyRef.current.contains(e.target as Node))
         setCurrencyOpen(false);
+      if (companyRef.current && !companyRef.current.contains(e.target as Node))
+        setCompanyOpen(false);
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -79,7 +93,13 @@ function Header() {
     router.push(q.trim() ? `/shop?q=${encodeURIComponent(q.trim())}` : "/shop");
   };
 
-  const navLinks = isExport ? EXPORT_NAV : LOCAL_NAV;
+  const localNav = cmsNav.length
+    ? cmsNav.map(l => ({ label: l.label, href: l.href }))
+    : LOCAL_NAV;
+  const hasHealthCalc = localNav.some(l => l.href === "/health-calculator");
+  const navLinks = isExport
+    ? EXPORT_NAV
+    : (hasHealthCalc ? localNav : [...localNav, { label: "Health Calculator", href: "/health-calculator" }]);
 
   return (
     <header className={`sticky top-0 z-50 border-b ${isExport ? "bg-[#052e1b] border-white/10" : "bg-[#FFFDF7] border-gray-200"}`}>
@@ -112,6 +132,35 @@ function Header() {
               {l.label}
             </Link>
           ))}
+          {!isExport && (
+            <div ref={companyRef} className="relative">
+              <button
+                onClick={() => setCompanyOpen(o => !o)}
+                className={`px-3 py-1.5 text-sm font-medium flex items-center gap-1 transition-colors ${
+                  pathname.startsWith("/about") || pathname.startsWith("/team") || pathname.startsWith("/faq")
+                    ? "text-green-900 border-b-2 border-green-900"
+                    : "text-gray-700 hover:text-green-900"
+                }`}
+              >
+                Company
+                <ChevronDown size={13} className={`transition-transform ${companyOpen ? "rotate-180" : ""}`} />
+              </button>
+              {companyOpen && (
+                <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 min-w-[180px] z-50 py-1">
+                  {COMPANY_NAV.map(l => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setCompanyOpen(false)}
+                      className={`block px-4 py-2.5 text-sm hover:bg-green-50 ${pathname === l.href ? "text-green-900 font-semibold" : "text-gray-700"}`}
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </nav>
 
         {/* Right actions */}
@@ -228,6 +277,31 @@ function Header() {
               {l.label}
             </Link>
           ))}
+          {!isExport && (
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => setCompanyMobileOpen(o => !o)}
+                className="w-full flex items-center justify-between py-2.5 text-sm font-medium text-gray-800"
+              >
+                Company
+                <ChevronDown size={14} className={`transition-transform ${companyMobileOpen ? "rotate-180" : ""}`} />
+              </button>
+              {companyMobileOpen && (
+                <div className="pb-2 pl-3 space-y-1">
+                  {COMPANY_NAV.map(l => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="block py-2 text-sm text-gray-600"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Mode switch */}
           {isExport ? (

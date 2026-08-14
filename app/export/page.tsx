@@ -22,6 +22,7 @@ const DEFAULT_HERO: ExportHeroContent = {
   catalogFootnote: "Prices are indicative FOB Lagos / Apapa in USD and subject to market conditions, lot size and destination. CIF, CFR and DDP terms available on request.",
   quoteCta1Label: "Send Quote Request",
   quoteCta2Label: "Talk to export desk",
+  hidePrices: false,
 };
 
 const DEFAULT_DESTINATIONS: ExportDestination[] = [
@@ -125,7 +126,7 @@ export default function ExportPage() {
             ))}
           </div>
 
-          <ExportCatalog commodities={commodities} footnote={hero.catalogFootnote} />
+          <ExportCatalog commodities={commodities} footnote={hero.catalogFootnote} hidePricesDefault={!!hero.hidePrices} />
 
           {/* Compliance link */}
           <div className="mt-4">

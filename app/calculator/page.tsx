@@ -216,6 +216,9 @@ export default function CalculatorPage() {
         <p className="text-gray-500 max-w-md mx-auto text-sm">
           Build a Nigerian meal, pick a health goal, and get instant nutrition analysis with personalized alerts and food alternatives.
         </p>
+        <Link href="/health-calculator" className="inline-block mt-4 text-sm font-semibold text-[#14532d] hover:underline">
+          Or try the Health Calculator →
+        </Link>
       </div>
 
       <div className="container-max py-10">

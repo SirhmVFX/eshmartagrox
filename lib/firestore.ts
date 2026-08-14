@@ -65,6 +65,11 @@ export interface SiteSettings {
     showUser: boolean;
     shopBannerImage?: string;
     shopBannerTitle?: string;
+    teamPageLabel?: string;
+    teamPageTitle?: string;
+    teamPageSubtitle?: string;
+    faqPageTitle?: string;
+    faqPageSubtitle?: string;
     // Social media
     facebook?: string;
     instagram?: string;
@@ -126,6 +131,10 @@ export interface BlogPost {
     readingTime?: string; // e.g. "5 min read"
 }
 
+export const PRODUCT_MEASURE_UNITS = [
+    "kg", "g", "cup", "pcs", "tbsp", "tsp", "bowl", "bunch", "pack", "litre", "ml",
+] as const;
+
 export interface FirestoreProduct {
     id?: string;
     name: string;
@@ -138,6 +147,7 @@ export interface FirestoreProduct {
     colors: string[];
     description: string;
     details: string[];
+    detailsHtml?: string;
     rating: number;
     reviews: number;
     inStock: boolean;
@@ -145,6 +155,20 @@ export interface FirestoreProduct {
     isBestSeller?: boolean;
     tags: string[];
     recommendedAddonIds?: string[];
+    relatedProductIds?: string[];
+    weight?: number;
+    weightUnit?: string;
+    measureAmount?: number;
+    measureUnit?: string;
+    servingSize?: string;
+    gramsPerUnit?: number;
+    caloriesPerServing?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    fibre?: number;
+    sodium?: number;
+    sugar?: number;
 }
 
 export interface Testimonial {
@@ -596,6 +620,10 @@ export interface ExportCommodity {
     markets?: ExportMarket[];
     packaging?: ExportPackaging[];
     image?: string;         // optional thumbnail
+    galleryImages?: string[];
+    description?: string;
+    detailsHtml?: string;
+    relatedIds?: string[];
     active: boolean;
     order: number;
 }
@@ -606,6 +634,12 @@ export async function getExportCommodities(): Promise<ExportCommodity[]> {
         .map(d => ({ id: d.id, ...d.data() } as ExportCommodity))
         .filter(c => c.active)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+export async function getExportCommodity(id: string): Promise<ExportCommodity | null> {
+    const snap = await getDoc(doc(db, "exportCommodities", id));
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() } as ExportCommodity;
 }
 
 // ── Export Quote Requests (client write) ──────────────────────────────────
@@ -765,6 +799,7 @@ export interface ExportHeroContent {
     catalogFootnote: string;
     quoteCta1Label: string;
     quoteCta2Label: string;
+    hidePrices?: boolean;
 }
 
 export async function getExportHeroContent(): Promise<ExportHeroContent | null> {
@@ -967,4 +1002,100 @@ export async function getNutritionists(): Promise<Nutritionist[]> {
         .map(d => ({ id: d.id, ...d.data() } as Nutritionist))
         .filter(n => n.active)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+// ── Health Calculator ──────────────────────────────────────────────────────
+
+export type HealthMetricKind = "number" | "derived_bmi";
+export type HealthStatus = "good" | "fair" | "bad";
+
+export interface HealthMetric {
+    id?: string;
+    key: string;
+    label: string;
+    unit: string;
+    icon: string;
+    placeholder?: string;
+    helpText?: string;
+    kind: HealthMetricKind;
+    scored: boolean;
+    greenMin: number;
+    greenMax: number;
+    yellowMin: number;
+    yellowMax: number;
+    order: number;
+    active: boolean;
+}
+
+export interface HealthCalculatorPage {
+    id?: string;
+    pageTitle: string;
+    pageSubtitle: string;
+    disclaimer: string;
+    goodLabel: string;
+    fairLabel: string;
+    badLabel: string;
+    goodMinScore: number;
+    fairMinScore: number;
+    ctaLabel?: string;
+    ctaHref?: string;
+}
+
+export const DEFAULT_HEALTH_PAGE: HealthCalculatorPage = {
+    pageTitle: "Health Calculator",
+    pageSubtitle: "Enter your height, weight, sleep, blood pressure, blood glucose and more to get a traffic-light health status.",
+    disclaimer: "This calculator provides general wellness guidance only. It does not replace medical advice. Please consult your doctor for personal health conditions.",
+    goodLabel: "Good health",
+    fairLabel: "Fairly good health status",
+    badLabel: "Very bad health",
+    goodMinScore: 1.6,
+    fairMinScore: 0.8,
+    ctaLabel: "Book a nutrition consultation",
+    ctaHref: "/book-online",
+};
+
+export const DEFAULT_HEALTH_METRICS: HealthMetric[] = [
+    { key: "height", label: "Height", unit: "cm", icon: "📏", placeholder: "e.g. 170", helpText: "Used with weight to calculate BMI.", kind: "number", scored: false, greenMin: 0, greenMax: 0, yellowMin: 0, yellowMax: 0, order: 1, active: true },
+    { key: "weight", label: "Weight", unit: "kg", icon: "⚖️", placeholder: "e.g. 68", helpText: "Used with height to calculate BMI.", kind: "number", scored: false, greenMin: 0, greenMax: 0, yellowMin: 0, yellowMax: 0, order: 2, active: true },
+    { key: "bmi", label: "Body Mass Index (BMI)", unit: "kg/m²", icon: "📊", helpText: "Calculated automatically from height and weight.", kind: "derived_bmi", scored: true, greenMin: 18.5, greenMax: 24.9, yellowMin: 17, yellowMax: 29.9, order: 3, active: true },
+    { key: "sleep", label: "Sleeping hours", unit: "hrs/night", icon: "😴", placeholder: "e.g. 7.5", helpText: "Average hours of sleep per night.", kind: "number", scored: true, greenMin: 7, greenMax: 9, yellowMin: 6, yellowMax: 10, order: 4, active: true },
+    { key: "bp_systolic", label: "Blood Pressure (Systolic)", unit: "mmHg", icon: "🫀", placeholder: "e.g. 118", helpText: "The top number of your blood pressure reading.", kind: "number", scored: true, greenMin: 90, greenMax: 120, yellowMin: 80, yellowMax: 139, order: 5, active: true },
+    { key: "bp_diastolic", label: "Blood Pressure (Diastolic)", unit: "mmHg", icon: "🫀", placeholder: "e.g. 76", helpText: "The bottom number of your blood pressure reading.", kind: "number", scored: true, greenMin: 60, greenMax: 80, yellowMin: 50, yellowMax: 89, order: 6, active: true },
+    { key: "glucose", label: "Blood Glucose (fasting)", unit: "mg/dL", icon: "🩸", placeholder: "e.g. 92", helpText: "Fasting blood glucose reading.", kind: "number", scored: true, greenMin: 70, greenMax: 99, yellowMin: 55, yellowMax: 125, order: 7, active: true },
+    { key: "heart_rate", label: "Resting Heart Rate", unit: "bpm", icon: "❤️", placeholder: "e.g. 72", helpText: "Beats per minute at rest.", kind: "number", scored: true, greenMin: 60, greenMax: 100, yellowMin: 50, yellowMax: 110, order: 8, active: true },
+    { key: "waist", label: "Waist Circumference", unit: "cm", icon: "📐", placeholder: "e.g. 82", helpText: "Measured at the navel.", kind: "number", scored: true, greenMin: 0, greenMax: 94, yellowMin: 0, yellowMax: 102, order: 9, active: true },
+    { key: "water", label: "Daily Water Intake", unit: "litres", icon: "💧", placeholder: "e.g. 2.5", helpText: "Average litres of water drunk per day.", kind: "number", scored: true, greenMin: 2, greenMax: 4, yellowMin: 1.5, yellowMax: 5, order: 10, active: true },
+];
+
+export async function getHealthMetrics(): Promise<HealthMetric[]> {
+    const snap = await getDocs(collection(db, "healthMetrics"));
+    const items = snap.docs
+        .map(d => ({ id: d.id, ...d.data() } as HealthMetric))
+        .filter(m => m.active)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    return items.length ? items : DEFAULT_HEALTH_METRICS;
+}
+
+export async function getHealthCalculatorPage(): Promise<HealthCalculatorPage> {
+    const snap = await getDocs(collection(db, "healthCalculatorPage"));
+    if (snap.empty) return DEFAULT_HEALTH_PAGE;
+    return { id: snap.docs[0].id, ...snap.docs[0].data() } as HealthCalculatorPage;
+}
+
+export function scoreHealthMetric(metric: HealthMetric, value: number): HealthStatus {
+    if (value >= metric.greenMin && value <= metric.greenMax) return "good";
+    if (value >= metric.yellowMin && value <= metric.yellowMax) return "fair";
+    return "bad";
+}
+
+export function overallHealthStatus(
+    scores: HealthStatus[],
+    page: HealthCalculatorPage
+): HealthStatus {
+    if (!scores.length) return "fair";
+    const numeric = scores.map(s => (s === "good" ? 2 : s === "fair" ? 1 : 0));
+    const avg = numeric.reduce((a, b) => a + b, 0) / numeric.length;
+    if (avg >= (page.goodMinScore ?? 1.6)) return "good";
+    if (avg >= (page.fairMinScore ?? 0.8)) return "fair";
+    return "bad";
 }

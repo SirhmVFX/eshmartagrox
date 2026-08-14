@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Minus, Plus, Check } from "lucide-react";
 import {
   getProducts, getSiteSettings, FirestoreProduct,
@@ -80,8 +81,8 @@ function FilterSection({ title, options, selected, onChange }: {
 function BuildBox({ items }: { items: BoxItem[] }) {
   const { format } = useCurrency();
   const { add } = useCart();
+  const router = useRouter();
   const [qty, setQty] = useState<Record<number, number>>({});
-  const [added, setAdded] = useState(false);
 
   const total = items.reduce((sum, it, i) => sum + (qty[i] ?? 0) * it.price, 0);
   const itemCount = Object.values(qty).reduce((s, q) => s + q, 0);
@@ -89,10 +90,9 @@ function BuildBox({ items }: { items: BoxItem[] }) {
   const handleAddBox = () => {
     items.forEach((item, i) => {
       const q = qty[i] ?? 0;
-      if (q > 0) add({ id: `box-${i}`, name: item.name, price: item.price, quantity: q });
+      if (q > 0) add({ id: item.id ?? `box-${i}`, name: item.name, price: item.price, quantity: q });
     });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    router.push("/cart");
   };
 
   return (
@@ -135,7 +135,7 @@ function BuildBox({ items }: { items: BoxItem[] }) {
           disabled={!itemCount}
           className="bg-gray-800 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-gray-900 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
         >
-          {added ? <><Check size={13} /> Added!</> : "Order custom box"}
+          {itemCount ? "Checkout custom box" : "Order custom box"}
         </button>
       </div>
     </div>
@@ -156,6 +156,7 @@ export default function Shop() {
   const [activeTab, setActiveTab] = useState<"packages" | "box" | "all">("packages");
   const { format } = useCurrency();
   const { add } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     Promise.all([getProducts(), getSiteSettings()])
@@ -253,7 +254,10 @@ export default function Shop() {
                       ))}
                     </ul>
                     <button
-                      onClick={() => add({ id: `pkg-${pkg.name}`, name: pkg.name, price: pkg.price, quantity: 1 })}
+                      onClick={() => {
+                        add({ id: pkg.id ?? `pkg-${pkg.name}`, name: pkg.name, price: pkg.price, quantity: 1 });
+                        router.push("/cart");
+                      }}
                       className="w-full bg-[#0d1b12] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-gray-800 transition-colors"
                     >
                       Subscribe
@@ -330,6 +334,15 @@ export default function Shop() {
                       <div className="p-3">
                         <p className="text-xs text-green-600 font-medium mb-1">{product.category}</p>
                         <p className="font-semibold text-gray-900 text-sm line-clamp-2">{product.name}</p>
+                        {(product.weight || product.measureAmount || product.servingSize) && (
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {[
+                              product.servingSize,
+                              product.weight != null ? `${product.weight} ${product.weightUnit || "kg"}` : null,
+                              product.measureAmount != null ? `${product.measureAmount} ${product.measureUnit || "pcs"}` : null,
+                            ].filter(Boolean).join(" · ")}
+                          </p>
+                        )}
                         <div className="mt-2 flex items-baseline gap-2">
                           <span className="text-base font-bold text-green-700">{format(product.price)}</span>
                           {product.originalPrice && (

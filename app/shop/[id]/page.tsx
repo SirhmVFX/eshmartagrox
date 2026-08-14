@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
-import { getProduct, getSiteSettings, getRecommendedAddons, FirestoreProduct } from "@/lib/firestore";
+import { getProduct, getProducts, getSiteSettings, getRecommendedAddons, FirestoreProduct } from "@/lib/firestore";
 import { useCurrency } from "@/lib/currency";
 
 export default function ProductPage() {
@@ -15,6 +15,7 @@ export default function ProductPage() {
 
     const [product, setProduct] = useState<FirestoreProduct | null>(null);
     const [addons, setAddons] = useState<FirestoreProduct[]>([]);
+    const [related, setRelated] = useState<FirestoreProduct[]>([]);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [selectedSize, setSelectedSize] = useState<string>("");
@@ -25,12 +26,19 @@ export default function ProductPage() {
 
     useEffect(() => {
         if (!id) return;
-        Promise.all([getProduct(id), getSiteSettings()])
-            .then(([data, settings]) => {
+        Promise.all([getProduct(id), getSiteSettings(), getProducts()])
+            .then(([data, settings, all]) => {
                 if (!data) return;
                 setProduct(data);
                 if (data.sizes?.length) setSelectedSize(data.sizes[0]);
                 if (data.colors?.length) setSelectedColor(data.colors[0]);
+                const relatedSet = new Set(data.relatedProductIds ?? []);
+                const others = all.filter(p => p.id && p.id !== data.id);
+                const picked = [
+                    ...others.filter(p => relatedSet.has(p.id!)),
+                    ...others.filter(p => !relatedSet.has(p.id!) && p.category && p.category === data.category),
+                ].slice(0, 8);
+                setRelated(picked);
             })
             .finally(() => setLoading(false));
 
@@ -107,6 +115,39 @@ export default function ProductPage() {
 
                     {product.description && <p className="text-gray-600 text-sm md:text-base">{product.description}</p>}
 
+                    {(product.weight != null || product.measureAmount != null || product.servingSize) && (
+                        <div className="bg-[#FFFDF7] border border-gray-100 rounded-xl p-4 space-y-1.5 text-sm">
+                            <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Measurements</p>
+                            {product.servingSize && (
+                                <div className="flex justify-between"><span className="text-gray-500">Serving size</span><span className="font-medium text-gray-800">{product.servingSize}</span></div>
+                            )}
+                            {product.weight != null && (
+                                <div className="flex justify-between"><span className="text-gray-500">Weight</span><span className="font-medium text-gray-800">{product.weight} {product.weightUnit || "kg"}</span></div>
+                            )}
+                            {product.measureAmount != null && (
+                                <div className="flex justify-between"><span className="text-gray-500">Measure</span><span className="font-medium text-gray-800">{product.measureAmount} {product.measureUnit || "pcs"}</span></div>
+                            )}
+                            {product.gramsPerUnit != null && (
+                                <div className="flex justify-between"><span className="text-gray-500">Grams per unit</span><span className="font-medium text-gray-800">{product.gramsPerUnit} g</span></div>
+                            )}
+                            {product.caloriesPerServing != null && (
+                                <div className="flex justify-between"><span className="text-gray-500">Calories / serving</span><span className="font-medium text-gray-800">{product.caloriesPerServing} kcal</span></div>
+                            )}
+                            {(product.protein != null || product.carbs != null || product.fat != null) && (
+                                <div className="flex justify-between text-xs text-gray-500 pt-1">
+                                    <span>
+                                        {[
+                                            product.protein != null ? `P ${product.protein}g` : null,
+                                            product.carbs != null ? `C ${product.carbs}g` : null,
+                                            product.fat != null ? `F ${product.fat}g` : null,
+                                            product.fibre != null ? `Fibre ${product.fibre}g` : null,
+                                        ].filter(Boolean).join(" · ")}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* Sizes */}
                     {product.sizes?.length > 0 && (
                         <div>
@@ -165,6 +206,15 @@ export default function ProductPage() {
                 </div>
             </div>
 
+            {product.detailsHtml && (
+                <div
+                    className="mt-12 prose prose-sm sm:prose-base max-w-none text-gray-700
+                        prose-headings:text-green-900 prose-headings:font-bold
+                        prose-a:text-green-700 prose-img:rounded-xl"
+                    dangerouslySetInnerHTML={{ __html: product.detailsHtml }}
+                />
+            )}
+
             {/* ── Recommended Add-ons ── */}
             {addons.length > 0 && (
                 <div className="mt-16 border-t border-gray-100 pt-12">
@@ -218,6 +268,39 @@ export default function ProductPage() {
                                 </div>
                             );
                         })}
+                    </div>
+                </div>
+            )}
+
+            {related.length > 0 && (
+                <div className="mt-16 border-t border-gray-100 pt-12">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">Related Products</h2>
+                    <p className="text-sm text-gray-500 mb-6">More from this category</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {related.map((p) => (
+                            <Link key={p.id} href={`/shop/${p.id}`} className="border border-gray-200 group hover:border-green-900 transition-colors block">
+                                <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
+                                    <Image
+                                        src={p.images?.[0] ?? "/assets/6.jpg"}
+                                        alt={p.name}
+                                        fill
+                                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                    />
+                                </div>
+                                <div className="p-3 space-y-1">
+                                    <p className="text-sm font-semibold text-gray-800 line-clamp-2 hover:text-green-900">{p.name}</p>
+                                    <p className="text-green-700 font-bold text-sm">{format(p.price)}</p>
+                                    {(p.weight != null || p.measureAmount != null) && (
+                                        <p className="text-xs text-gray-400">
+                                            {[
+                                                p.weight != null ? `${p.weight} ${p.weightUnit || "kg"}` : null,
+                                                p.measureAmount != null ? `${p.measureAmount} ${p.measureUnit || "pcs"}` : null,
+                                            ].filter(Boolean).join(" · ")}
+                                        </p>
+                                    )}
+                                </div>
+                            </Link>
+                        ))}
                     </div>
                 </div>
             )}

@@ -19,20 +19,20 @@ const COLS = [
   {
     heading: "Health",
     links: [
+      { label: "Nutrition Calculator", href: "/calculator" },
+      { label: "Health Calculator", href: "/health-calculator" },
       { label: "Diabetes", href: "/calculator" },
       { label: "Blood Pressure", href: "/calculator" },
-      { label: "Cholesterol", href: "/calculator" },
       { label: "Healthy Aging", href: "/calculator" },
-      { label: "BMI Calculator", href: "/calculator" },
     ],
   },
   {
     heading: "Company",
     links: [
       { label: "About Us", href: "/about" },
+      { label: "Team members", href: "/team" },
+      { label: "FAQ", href: "/faq" },
       { label: "Blog", href: "/blog" },
-      { label: "Community", href: "/#community" },
-      { label: "Loyalty Club", href: "/profile" },
       { label: "Careers", href: "/contact" },
     ],
   },
@@ -43,7 +43,7 @@ const COLS = [
       { label: "Delivery Zones", href: "/contact" },
       { label: "Returns", href: "/contact" },
       { label: "+234 704 729 6000", href: "tel:+2347047296000" },
-      { label: "FAQ", href: "/#faq" },
+      { label: "FAQ", href: "/faq" },
     ],
   },
 ];
