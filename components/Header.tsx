@@ -1,6 +1,13 @@
 "use client";
 
-import { Search, ShoppingCart, Menu, X, ChevronDown, Globe } from "lucide-react";
+import {
+  Search,
+  ShoppingCart,
+  Menu,
+  X,
+  ChevronDown,
+  Globe,
+} from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import { useRouter, usePathname } from "next/navigation";
@@ -8,12 +15,17 @@ import { useEffect, useState, useRef } from "react";
 import { useCart } from "@/lib/cart";
 import { useCurrency } from "@/lib/currency";
 import Image from "next/image";
-import { getSiteSettings, SiteSettings, getNavLinks, NavLink } from "@/lib/firestore";
+import {
+  getSiteSettings,
+  SiteSettings,
+  getNavLinks,
+  NavLink,
+} from "@/lib/firestore";
 
 const LOCAL_NAV = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
-  { label: "Calculator", href: "/calculator" },
+  { label: "Nutrition Calculator", href: "/calculator" },
   { label: "Health Calculator", href: "/health-calculator" },
   { label: "Blog", href: "/blog" },
   { label: "Book Online", href: "/book-online" },
@@ -72,13 +84,24 @@ function Header() {
   const isExport = pathname.startsWith("/export");
 
   useEffect(() => {
-    getSiteSettings().then(s => { if (s) setSettings(s); }).catch(() => { });
-    getNavLinks().then(links => { if (links.length) setCmsNav(links); }).catch(() => { });
+    getSiteSettings()
+      .then((s) => {
+        if (s) setSettings(s);
+      })
+      .catch(() => {});
+    getNavLinks()
+      .then((links) => {
+        if (links.length) setCmsNav(links);
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (currencyRef.current && !currencyRef.current.contains(e.target as Node))
+      if (
+        currencyRef.current &&
+        !currencyRef.current.contains(e.target as Node)
+      )
         setCurrencyOpen(false);
       if (companyRef.current && !companyRef.current.contains(e.target as Node))
         setCompanyOpen(false);
@@ -94,40 +117,64 @@ function Header() {
   };
 
   const localNav = cmsNav.length
-    ? cmsNav.map(l => ({ label: l.label, href: l.href }))
+    ? cmsNav.map((l) => ({ label: l.label, href: l.href }))
     : LOCAL_NAV;
-  const hasHealthCalc = localNav.some(l => l.href === "/health-calculator");
+  const hasHealthCalc = localNav.some((l) => l.href === "/health-calculator");
   const navLinks = isExport
     ? EXPORT_NAV
-    : (hasHealthCalc ? localNav : [...localNav, { label: "Health Calculator", href: "/health-calculator" }]);
+    : hasHealthCalc
+      ? localNav
+      : [
+          ...localNav,
+          { label: "Health Calculator", href: "/health-calculator" },
+        ];
 
   return (
-    <header className={`sticky top-0 z-50 border-b ${isExport ? "bg-[#052e1b] border-white/10" : "bg-[#FFFDF7] border-gray-200"}`}>
+    <header
+      className={`sticky top-0 z-50 border-b ${isExport ? "bg-[#052e1b] border-white/10" : "bg-[#FFFDF7] border-gray-200"}`}
+    >
       <div className="container-90 flex items-center justify-between py-2 gap-4">
-
         {/* Logo */}
         <Link href="/" className="shrink-0">
           <div className="w-20 h-20 md:w-36 md:h-36 relative">
             {isExport ? (
-              <Image src="/assets/eshmartlogowhite.png" alt="Eshmart Agrox" width={2000} height={2000} className="w-full h-full object-contain" />
+              <Image
+                src="/assets/eshmartlogowhite.png"
+                alt="Eshmart Agrox"
+                width={2000}
+                height={2000}
+                className="w-full h-full object-contain"
+              />
             ) : settings.logoUrl ? (
-              <Image src={settings.logoUrl} alt={settings.siteName} fill className="object-contain" />
+              <Image
+                src={settings.logoUrl}
+                alt={settings.siteName}
+                fill
+                className="object-contain"
+              />
             ) : (
-              <Image src="/assets/eshmartlogo.png" alt="Eshmart Agrox" width={2000} height={2000} className="w-full h-full object-contain" />
+              <Image
+                src="/assets/eshmartlogo.png"
+                alt="Eshmart Agrox"
+                width={2000}
+                height={2000}
+                className="w-full h-full object-contain"
+              />
             )}
           </div>
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map(l => (
+          {navLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className={`px-3 py-1.5 text-sm font-medium transition-colors ${isExport
-                ? "text-white/80 hover:text-white"
-                : "text-gray-700 hover:text-green-900"
-                } ${pathname === l.href ? (isExport ? "text-white" : "text-green-900 border-b-2 border-green-900") : ""}`}
+              className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                isExport
+                  ? "text-white/80 hover:text-white"
+                  : "text-gray-700 hover:text-green-900"
+              } ${pathname === l.href ? (isExport ? "text-white" : "text-green-900 border-b-2 border-green-900") : ""}`}
             >
               {l.label}
             </Link>
@@ -135,19 +182,24 @@ function Header() {
           {!isExport && (
             <div ref={companyRef} className="relative">
               <button
-                onClick={() => setCompanyOpen(o => !o)}
+                onClick={() => setCompanyOpen((o) => !o)}
                 className={`px-3 py-1.5 text-sm font-medium flex items-center gap-1 transition-colors ${
-                  pathname.startsWith("/about") || pathname.startsWith("/team") || pathname.startsWith("/faq")
+                  pathname.startsWith("/about") ||
+                  pathname.startsWith("/team") ||
+                  pathname.startsWith("/faq")
                     ? "text-green-900 border-b-2 border-green-900"
                     : "text-gray-700 hover:text-green-900"
                 }`}
               >
                 Company
-                <ChevronDown size={13} className={`transition-transform ${companyOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  size={13}
+                  className={`transition-transform ${companyOpen ? "rotate-180" : ""}`}
+                />
               </button>
               {companyOpen && (
                 <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 min-w-[180px] z-50 py-1">
-                  {COMPANY_NAV.map(l => (
+                  {COMPANY_NAV.map((l) => (
                     <Link
                       key={l.href}
                       href={l.href}
@@ -165,7 +217,6 @@ function Header() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2 md:gap-3">
-
           {/* Mode switcher — the distinctive button */}
           {isExport ? (
             <Link
@@ -186,12 +237,15 @@ function Header() {
 
           {/* Search — local only */}
           {!isExport && settings.showSearch && (
-            <form onSubmit={submitSearch} className="hidden lg:flex items-center border border-gray-200 rounded-full overflow-hidden">
+            <form
+              onSubmit={submitSearch}
+              className="hidden lg:flex items-center border border-gray-200 rounded-full overflow-hidden"
+            >
               <input
                 placeholder="Search…"
                 className="px-3 py-1.5 outline-none text-sm bg-transparent w-36"
                 value={q}
-                onChange={e => setQ(e.target.value)}
+                onChange={(e) => setQ(e.target.value)}
               />
               <button type="submit" className="px-2">
                 <Search size={15} className="text-gray-500" />
@@ -203,24 +257,34 @@ function Header() {
           {rates.length > 1 && (
             <div ref={currencyRef} className="relative">
               <button
-                onClick={() => setCurrencyOpen(o => !o)}
+                onClick={() => setCurrencyOpen((o) => !o)}
                 className={`flex items-center gap-1 text-xs font-semibold border px-2 py-1.5 transition-colors ${isExport ? "border-white/20 text-white hover:border-white" : "border-gray-200 text-green-900 hover:border-green-900"}`}
               >
                 {selected.symbol}
                 <span className="hidden sm:inline">{selected.code}</span>
-                <ChevronDown size={11} className={`transition-transform ${currencyOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  size={11}
+                  className={`transition-transform ${currencyOpen ? "rotate-180" : ""}`}
+                />
               </button>
               {currencyOpen && (
                 <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200  z-50 min-w-[160px]">
-                  {rates.map(r => (
+                  {rates.map((r) => (
                     <button
                       key={r.code}
-                      onClick={() => { setSelected(r); setCurrencyOpen(false); }}
+                      onClick={() => {
+                        setSelected(r);
+                        setCurrencyOpen(false);
+                      }}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left hover:bg-green-50 ${selected.code === r.code ? "bg-green-50 text-green-900 font-semibold" : "text-gray-700"}`}
                     >
-                      <span className="w-5 text-center font-semibold text-green-700">{r.symbol}</span>
+                      <span className="w-5 text-center font-semibold text-green-700">
+                        {r.symbol}
+                      </span>
                       <span className="flex-1">{r.name}</span>
-                      <span className="text-xs text-gray-400 font-mono">{r.code}</span>
+                      <span className="text-xs text-gray-400 font-mono">
+                        {r.code}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -241,22 +305,28 @@ function Header() {
           )}
 
           {/* User */}
-          {settings.showUser && !isExport && (
-            user ? (
-              <Link href="/profile" className="hidden md:block text-xs font-medium text-green-900 hover:underline truncate max-w-[100px]">
+          {settings.showUser &&
+            !isExport &&
+            (user ? (
+              <Link
+                href="/profile"
+                className="hidden md:block text-xs font-medium text-green-900 hover:underline truncate max-w-[100px]"
+              >
                 {user.displayName ?? "Account"}
               </Link>
             ) : (
-              <Link href="/login" className="hidden md:block text-xs font-medium text-green-900 hover:underline">
+              <Link
+                href="/login"
+                className="hidden md:block text-xs font-medium text-green-900 hover:underline"
+              >
                 Sign in
               </Link>
-            )
-          )}
+            ))}
 
           {/* Hamburger */}
           <button
             className={`md:hidden p-1.5 ${isExport ? "text-white" : "text-green-900"}`}
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={() => setMenuOpen((o) => !o)}
             aria-label="Menu"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -266,8 +336,10 @@ function Header() {
 
       {/* Mobile drawer */}
       {menuOpen && (
-        <div className={`md:hidden border-t px-5 py-4 space-y-1 ${isExport ? "bg-[#052e1b] border-white/10" : "bg-white border-gray-100"}`}>
-          {navLinks.map(l => (
+        <div
+          className={`md:hidden border-t px-5 py-4 space-y-1 ${isExport ? "bg-[#052e1b] border-white/10" : "bg-white border-gray-100"}`}
+        >
+          {navLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
@@ -280,15 +352,18 @@ function Header() {
           {!isExport && (
             <div className="border-b border-gray-100">
               <button
-                onClick={() => setCompanyMobileOpen(o => !o)}
+                onClick={() => setCompanyMobileOpen((o) => !o)}
                 className="w-full flex items-center justify-between py-2.5 text-sm font-medium text-gray-800"
               >
                 Company
-                <ChevronDown size={14} className={`transition-transform ${companyMobileOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform ${companyMobileOpen ? "rotate-180" : ""}`}
+                />
               </button>
               {companyMobileOpen && (
                 <div className="pb-2 pl-3 space-y-1">
-                  {COMPANY_NAV.map(l => (
+                  {COMPANY_NAV.map((l) => (
                     <Link
                       key={l.href}
                       href={l.href}
@@ -305,30 +380,74 @@ function Header() {
 
           {/* Mode switch */}
           {isExport ? (
-            <Link href="/" onClick={() => setMenuOpen(false)} className="block mt-3 text-center bg-white text-[#052e1b] text-xs font-bold px-4 py-2 rounded-full">
+            <Link
+              href="/"
+              onClick={() => setMenuOpen(false)}
+              className="block mt-3 text-center bg-white text-[#052e1b] text-xs font-bold px-4 py-2 rounded-full"
+            >
               ← Local Store
             </Link>
           ) : (
-            <Link href="/export" onClick={() => setMenuOpen(false)} className="block mt-3 text-center bg-[#052e1b] text-white text-xs font-bold px-4 py-2 rounded-full">
-              <span className="flex items-center justify-center gap-1.5"><Globe size={12} /> International Export</span>
+            <Link
+              href="/export"
+              onClick={() => setMenuOpen(false)}
+              className="block mt-3 text-center bg-[#052e1b] text-white text-xs font-bold px-4 py-2 rounded-full"
+            >
+              <span className="flex items-center justify-center gap-1.5">
+                <Globe size={12} /> International Export
+              </span>
             </Link>
           )}
 
           {!isExport && (
             <>
               {settings.showSearch && (
-                <form onSubmit={e => { submitSearch(e); setMenuOpen(false); }} className="flex items-center border border-gray-200 rounded-full mt-3 overflow-hidden">
-                  <input placeholder="Search products…" className="flex-1 px-3 py-2 text-sm outline-none" value={q} onChange={e => setQ(e.target.value)} />
-                  <button type="submit" className="px-3"><Search size={15} className="text-gray-500" /></button>
+                <form
+                  onSubmit={(e) => {
+                    submitSearch(e);
+                    setMenuOpen(false);
+                  }}
+                  className="flex items-center border border-gray-200 rounded-full mt-3 overflow-hidden"
+                >
+                  <input
+                    placeholder="Search products…"
+                    className="flex-1 px-3 py-2 text-sm outline-none"
+                    value={q}
+                    onChange={(e) => setQ(e.target.value)}
+                  />
+                  <button type="submit" className="px-3">
+                    <Search size={15} className="text-gray-500" />
+                  </button>
                 </form>
               )}
               {user ? (
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                  <Link href="/profile" onClick={() => setMenuOpen(false)} className="text-sm text-green-900">{user.displayName ?? user.email}</Link>
-                  <button className="text-sm text-red-600" onClick={async () => { setMenuOpen(false); await logout(); window.location.href = "/"; }}>Sign out</button>
+                  <Link
+                    href="/profile"
+                    onClick={() => setMenuOpen(false)}
+                    className="text-sm text-green-900"
+                  >
+                    {user.displayName ?? user.email}
+                  </Link>
+                  <button
+                    className="text-sm text-red-600"
+                    onClick={async () => {
+                      setMenuOpen(false);
+                      await logout();
+                      window.location.href = "/";
+                    }}
+                  >
+                    Sign out
+                  </button>
                 </div>
               ) : (
-                <Link href="/login" onClick={() => setMenuOpen(false)} className="block py-2 text-sm text-green-900 font-medium">Sign in / Register</Link>
+                <Link
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="block py-2 text-sm text-green-900 font-medium"
+                >
+                  Sign in / Register
+                </Link>
               )}
             </>
           )}
