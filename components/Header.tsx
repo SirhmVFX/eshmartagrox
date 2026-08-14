@@ -198,7 +198,7 @@ function Header() {
                 />
               </button>
               {companyOpen && (
-                <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 min-w-[180px] z-50 py-1">
+                <div className="absolute left-0 top-full mt-1 bg-white border border-gray-200 min-w-45 z-50 py-1">
                   {COMPANY_NAV.map((l) => (
                     <Link
                       key={l.href}
@@ -268,7 +268,7 @@ function Header() {
                 />
               </button>
               {currencyOpen && (
-                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200  z-50 min-w-[160px]">
+                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200  z-50 min-w-40">
                   {rates.map((r) => (
                     <button
                       key={r.code}
@@ -310,7 +310,7 @@ function Header() {
             (user ? (
               <Link
                 href="/profile"
-                className="hidden md:block text-xs font-medium text-green-900 hover:underline truncate max-w-[100px]"
+                className="hidden md:block text-xs font-medium text-green-900 hover:underline truncate max-w-25"
               >
                 {user.displayName ?? "Account"}
               </Link>

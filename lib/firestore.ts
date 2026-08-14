@@ -1093,7 +1093,7 @@ export function overallHealthStatus(
     page: HealthCalculatorPage
 ): HealthStatus {
     if (!scores.length) return "fair";
-    const numeric = scores.map(s => (s === "good" ? 2 : s === "fair" ? 1 : 0));
+    const numeric: number[] = scores.map(s => (s === "good" ? 2 : s === "fair" ? 1 : 0));
     const avg = numeric.reduce((a, b) => a + b, 0) / numeric.length;
     if (avg >= (page.goodMinScore ?? 1.6)) return "good";
     if (avg >= (page.fairMinScore ?? 0.8)) return "fair";
