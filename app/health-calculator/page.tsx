@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   getHealthMetrics, getHealthCalculatorPage,
-  HealthMetric, HealthCalculatorPage, HealthStatus,
   DEFAULT_HEALTH_METRICS, DEFAULT_HEALTH_PAGE,
   scoreHealthMetric, overallHealthStatus,
 } from "@/lib/firestore";
+import type { HealthMetric, HealthCalculatorPage as HealthCalculatorContent, HealthStatus } from "@/lib/firestore";
 
 function TrafficLight({ status, size = "lg" }: { status: HealthStatus | null; size?: "lg" | "sm" }) {
   const large = size === "lg";
@@ -53,9 +53,9 @@ function statusBg(s: HealthStatus) {
   return s === "good" ? "bg-green-50 border-green-200" : s === "fair" ? "bg-amber-50 border-amber-200" : "bg-red-50 border-red-200";
 }
 
-export default function HealthCalculatorPage() {
+export default function HealthCalculator() {
   const [metrics, setMetrics] = useState<HealthMetric[]>(DEFAULT_HEALTH_METRICS);
-  const [page, setPage] = useState<HealthCalculatorPage>(DEFAULT_HEALTH_PAGE);
+  const [page, setPage] = useState<HealthCalculatorContent>(DEFAULT_HEALTH_PAGE);
   const [values, setValues] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
